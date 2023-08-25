@@ -15,6 +15,15 @@
 
 ...
 
+## Running
+### one-intermediate-node.cc
+Navigate to the ns-3.39 folder and run:  
+```make oneIntermediate```  
+
+### three-intermediate-nodes.cc
+Navigate to the ns-3.39 folder and run:  
+```make threeIntermediate```  
+
 ## References
 
 [1] Ricker, Travis, et al. "A Machine Learning Approach to Estimating Queuing Delay on a Router over a Single-Hop Path." ICC 2022-IEEE International Conference on Communications. IEEE, 2022.
