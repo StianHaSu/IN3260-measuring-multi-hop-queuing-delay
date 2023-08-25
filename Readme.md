@@ -3,7 +3,7 @@
 ## Tasks
 
 1. [Get to know ns-3](https://www.nsnam.org/documentation/)  
-2. Set up a topology with a single intermediate node in ns-3  [example script](https://www.nsnam.org/docs/release/3.39/tutorial/html/conceptual-overview.html#a-first-ns-3-script), see [first.cc](https://www.nsnam.org/docs/release/3.19/doxygen/first_8cc_source.html) example        
+2. Set up a topology with a single intermediate node in ns-3  ( [example script](https://www.nsnam.org/docs/release/3.39/tutorial/html/conceptual-overview.html#a-first-ns-3-script), see [first.cc](https://www.nsnam.org/docs/release/3.19/doxygen/first_8cc_source.html) example)       
 4. Set up topology with multiple intermediate nodes in ns-3  
 5. Test step 3 and 4 by sending fixed sized packets (see line 61 in the first.cc file)
 6. Test step 3 and 4 by sending different packet sizes  (try different Ph and Pt sizes from [1])
