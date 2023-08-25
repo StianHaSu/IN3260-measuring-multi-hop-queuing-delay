@@ -9,7 +9,7 @@
 6. Test step 3 and 4 by sending different packet sizes  (try different Ph and Pt sizes from [1])
 7. Check that packets sent are the correct size under transmission (enable pcap tracing in ns3 using [enablepcap function line 109](https://www.nsnam.org/docs/release/3.19/doxygen/second_8cc_source.html) and then read pcap files with [wireshark](https://www.wireshark.org))
 8. Measure single hop queuing delay
-9. Set TTL for leading packets on multi hop topology
+9. Set TTL for leading packets on multi hop topology (COMMENT: I don't think we need to play with TTL fields. For the redundant packet Pr, just set the destination address to *router R*.)
 10. Measure cumulative queuing delay on multihop path
 11. Build queues on the intermediate nodes  
 
