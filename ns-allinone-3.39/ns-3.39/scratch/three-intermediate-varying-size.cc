@@ -8,15 +8,20 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE("OneIntermediateNode");
 
-void SendPacket(Ptr<ns3::Socket> socket, int packet_size)
-{
+void SendPacket(Ptr<ns3::Socket> socket, int packet_size) {   
+    socket->SetIpTtl(64); //Standard ttl value
     Ptr<ns3::Packet> packet = Create<Packet>(packet_size);
     socket->Send(packet);
 }
 
-int
-main(int argc, char* argv[])
-{
+void SendPacketWithTTL(Ptr<Socket> socket, int packet_size, int ttl) {
+    socket->SetIpTtl(ttl);
+    
+    Ptr<Packet> packet = Create<Packet>(packet_size);
+    socket->Send(packet);
+}
+
+int main(int argc, char* argv[]) {
     CommandLine cmd(__FILE__);
     cmd.Parse(argc, argv);
 
@@ -26,7 +31,7 @@ main(int argc, char* argv[])
     nodes.Create(5);
 
     PointToPointHelper pointToPoint;
-    pointToPoint.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
+    pointToPoint.SetDeviceAttribute("DataRate", StringValue("100Mbps"));
     pointToPoint.SetChannelAttribute("Delay", StringValue("2ms"));
 
     NodeContainer ab = NodeContainer(nodes.Get(0), nodes.Get(1));
@@ -36,15 +41,15 @@ main(int argc, char* argv[])
 
     NetDeviceContainer devices1 = pointToPoint.Install(ab);
     NetDeviceContainer devices2 = pointToPoint.Install(bc);
-    NetDeviceContainer devices3= pointToPoint.Install(cd);
-    NetDeviceContainer devices4 = pointToPoint.Install(de);
+    NetDeviceContainer devices3 = pointToPoint.Install(cd);
+    NetDeviceContainer devices4 = pointToPoint.Install(de);    
 
     InternetStackHelper stack;
     stack.Install(nodes);
 
     Ipv4AddressHelper address;
+    
     address.SetBase("10.1.1.0", "255.255.255.0");
-
     Ipv4InterfaceContainer interfaces1 = address.Assign(devices1);
 
     address.SetBase("10.1.2.0", "255.255.255.0");
@@ -70,6 +75,7 @@ main(int argc, char* argv[])
 
     pointToPoint.EnablePcapAll("three-intermediate-nodes-var");
 
+    Simulator::Schedule(Seconds(2.0), &SendPacketWithTTL, source, 100);
     Simulator::Schedule(Seconds(2.0), &SendPacket, source, 512);
     Simulator::Schedule(Seconds(2.0), &SendPacket, source, 1024);
     Simulator::Run();
