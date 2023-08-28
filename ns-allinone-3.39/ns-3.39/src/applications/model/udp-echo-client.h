@@ -132,6 +132,10 @@ class UdpEchoClient : public Application
 
   protected:
     void DoDispose() override;
+    /**
+     * \brief Send a packet
+     */
+    void Send();
 
   private:
     void StartApplication() override;
@@ -142,10 +146,6 @@ class UdpEchoClient : public Application
      * \param dt time interval between packets.
      */
     void ScheduleTransmit(Time dt);
-    /**
-     * \brief Send a packet
-     */
-    void Send();
 
     /**
      * \brief Handle a packet reception.

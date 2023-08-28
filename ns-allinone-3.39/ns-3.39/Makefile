@@ -9,3 +9,9 @@ cleanOne:
 
 cleanThree:
 	rm three-intermediate-nodes-*
+
+threeIntermediateVar:
+	./ns3 run scratch/three-intermediate-varying-size
+
+cleanThreeVar:
+	rm three-intermediate-nodes-var-*
