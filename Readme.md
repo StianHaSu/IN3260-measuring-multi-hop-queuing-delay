@@ -26,6 +26,6 @@ Navigate to the ns-3.39 folder and run:
 
 ## References
 
-[1] Ricker, Travis, et al. "A Machine Learning Approach to Estimating Queuing Delay on a Router over a Single-Hop Path." ICC 2022-IEEE International Conference on Communications. IEEE, 2022.
-[2] K. Salehin, K. W. Kwon and R. Rojas-Cessa, "A Simulation Study of the Measurement of Queueing Delay Over End-to-End Paths," in IEEE Open Journal of the Computer Society, vol. 1, pp. 1-11, 2020.
+[1] Ricker, Travis, et al. "A Machine Learning Approach to Estimating Queuing Delay on a Router over a Single-Hop Path." ICC 2022-IEEE International Conference on Communications. IEEE, 2022. <br />
+[2] K. Salehin, K. W. Kwon and R. Rojas-Cessa, "A Simulation Study of the Measurement of Queueing Delay Over End-to-End Paths," in IEEE Open Journal of the Computer Society, vol. 1, pp. 1-11, 2020. <br />
 [3] K. M. Salehin and R. Rojas-Cessa, "Scheme for Measuring Queueing Delay of a Router Using Probe-Gap Model: The Single-Hop Case," in IEEE Communications Letters, vol. 18, no. 4, pp. 696-699, April 2014.
