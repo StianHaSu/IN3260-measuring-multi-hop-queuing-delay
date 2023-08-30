@@ -3,6 +3,7 @@
 #include "ns3/internet-module.h"
 #include "ns3/network-module.h"
 #include "ns3/point-to-point-module.h"
+#include "ns3/traffic-control-helper.h"
 
 using namespace ns3;
 
@@ -21,6 +22,12 @@ void SendPacketWithTTL(Ptr<Socket> socket, int packet_size, int ttl) {
     socket->Send(packet);
 }
 
+void SendTrainOfPackets(Ptr<ns3::Socket> socket, int ttl) {
+    SendPacketWithTTL(socket, 2048, ttl);
+    SendPacket(socket, 512);
+    SendPacket(socket, 1028);
+}
+
 int main(int argc, char* argv[]) {
     CommandLine cmd(__FILE__);
     cmd.Parse(argc, argv);
@@ -29,6 +36,9 @@ int main(int argc, char* argv[]) {
 
     NodeContainer nodes;
     nodes.Create(5);
+
+    InternetStackHelper stack;
+    stack.Install(nodes);
 
     PointToPointHelper pointToPoint;
     pointToPoint.SetDeviceAttribute("DataRate", StringValue("100Mbps"));
@@ -44,8 +54,13 @@ int main(int argc, char* argv[]) {
     NetDeviceContainer devices3 = pointToPoint.Install(cd);
     NetDeviceContainer devices4 = pointToPoint.Install(de);    
 
-    InternetStackHelper stack;
-    stack.Install(nodes);
+    TrafficControlHelper tch;
+    tch.SetRootQueueDisc("ns3::FifoQueueDisc");
+
+    tch.Install(devices1);
+    tch.Install(devices2);
+    tch.Install(devices3);
+    tch.Install(devices4);
 
     Ipv4AddressHelper address;
     
@@ -75,9 +90,7 @@ int main(int argc, char* argv[]) {
 
     pointToPoint.EnablePcapAll("three-intermediate-nodes-var");
 
-    Simulator::Schedule(Seconds(2.0), &SendPacketWithTTL, source, 100);
-    Simulator::Schedule(Seconds(2.0), &SendPacket, source, 512);
-    Simulator::Schedule(Seconds(2.0), &SendPacket, source, 1024);
+    Simulator::Schedule(Seconds(2.0), &SendTrainOfPackets, source, 3);
     Simulator::Run();
     Simulator::Destroy();
 

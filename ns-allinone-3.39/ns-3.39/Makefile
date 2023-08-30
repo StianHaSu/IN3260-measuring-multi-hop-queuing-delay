@@ -1,3 +1,7 @@
+build:
+	./ns3 configure -d debug --enable-examples --enable-tests
+	./ns3 build
+
 oneIntermediate:
 	./ns3 run scratch/one-intermediate-node
 
