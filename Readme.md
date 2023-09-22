@@ -16,18 +16,18 @@
 ...
 
 ### Week 38  
-- Build a queue on a signle hop topology [x]
-- Filter out probing packet pairs on the receiving node [x]
-- Measure gap between probing pairs [x]
-- Use k-means++ to measure queueing delay on a signle interface [x]
+- [x] Build a queue on a signle hop topology 
+- [x] Filter out probing packet pairs on the receiving node 
+- [x] Measure gap between probing pairs 
+- [x] Use k-means++ to measure queueing delay on a signle interface 
 
 ### Week 39
-- Run simulation with different packet sizes [ ]
-- Set up topology with three intermediate nodes [ ]
-- Build queues on the three intermediate nodes with equal patterns [ ]
-- Run simulation with a redundant leading packet with a ttl [ ]
-- Measure queueing delay on the last intermediate node [ ]
-- Measure cumulative queueing delay on three intermediate nodes.
+- [ ] Run simulation with different packet sizes []
+- [ ] Set up topology with three intermediate nodes []
+- [ ] Build queues on the three intermediate nodes with equal patterns [ ]
+- [ ] Run simulation with a redundant leading packet with a ttl [ ]
+- [ ] Measure queueing delay on the last intermediate node [ ]
+- [ ] Measure cumulative queueing delay on three intermediate nodes.
 
 ## References
 
