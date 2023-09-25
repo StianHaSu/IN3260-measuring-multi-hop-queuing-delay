@@ -95,7 +95,6 @@ int main(int argc, char* argv[]) {
     NetDeviceContainer devices7 = pointToPoint.Install(bh);
     NetDeviceContainer devices8 = pointToPoint.Install(dj);
 
-
     TrafficControlHelper tch;
     tch.SetRootQueueDisc("ns3::FifoQueueDisc");
 

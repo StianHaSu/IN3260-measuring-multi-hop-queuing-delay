@@ -35,7 +35,7 @@ void SendTrainOfPackets(Ptr<Socket> socket, int ttl) {
 
 void GenerateCrossTraffic(Ptr<Socket> socket, int packetNum) {
     if (packetNum < 1) { return; }
-    SendPacket(socket, 64);
+    SendPacket(socket, 200);
 
     Simulator::Schedule(MicroSeconds(500), &GenerateCrossTraffic, socket, packetNum-1);
 }
@@ -139,8 +139,8 @@ int main(int argc, char* argv[]) {
     pointToPoint.EnablePcapAll("parallel-traffic");
 
     AnimationInterface anim("animation.xml");
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic1, 10);
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic2, 10);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic1, 100);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic2, 100);
     Simulator::Schedule(Seconds(2.0), &SendTrainOfPackets, source, 2);
     Simulator::Run();
     Simulator::Destroy();
