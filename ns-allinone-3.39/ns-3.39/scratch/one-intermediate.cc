@@ -8,7 +8,8 @@
 #include "../src/mobility/helper/mobility-helper.h"
 #include "../src/mobility/model/constant-position-mobility-model.h"
 #include <random>
-
+#include "../include/packet_info.h"
+#include <string>
 
 using namespace ns3;
 
@@ -20,14 +21,16 @@ std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_int_distribution<> dis(1, 5);
 
-int packet_trains = 500;
+int packet_trains = 100;
 
+//Sends a single packet over the socket with a given packet size
 void SendPacket(Ptr<Socket> socket, int packet_size) {
     socket->SetIpTtl(64); //Standard ttl value
     Ptr<ns3::Packet> packet = Create<Packet>(packet_size);
     socket->Send(packet);
 }
 
+//Sends a packet with a given ttl, used for the redundant packet
 void SendPacketWithTTL(Ptr<Socket> socket, int packet_size, int ttl) {
     socket->SetIpTtl(ttl);
     
@@ -35,34 +38,87 @@ void SendPacketWithTTL(Ptr<Socket> socket, int packet_size, int ttl) {
     socket->Send(packet);
 }
 
-void SendTrainOfPackets(Ptr<Socket> socket, int ttl) {
-    if (packet_trains % 50 == 0)std::cout<<packet_trains<<std::endl;
+//Sends a train of packets i.e the compound probe
+void SendTrainOfPackets(packet_info *p_info, Ptr<Socket> socket, int ttl) {
+    if (packet_trains % 50 == 0) { std::cout<<packet_trains<<std::endl; }
+
     if (packet_trains < 1) return;
-    //SendPacketWithTTL(socket, 2048, ttl);
-    SendPacket(socket, 64);
-    SendPacket(socket, 800);
+    SendPacket(socket, p_info->heading_s);
+    SendPacket(socket, p_info->trailing_s);
     packet_trains--;
 
-    Simulator::Schedule(MilliSeconds(dis(gen)*10), &SendTrainOfPackets, socket, ttl);
+    Simulator::Schedule(MilliSeconds(dis(gen)*10), &SendTrainOfPackets, p_info, socket, ttl);
 }
 
-void GenerateCrossTraffic(Ptr<Socket> socket, int rate, int p_size) {
+//Sends packet with a given time interval and packet size
+void GenerateCrossTraffic(packet_info *p_info, Ptr<Socket> socket, int rate) {
     if (packet_trains < 1) return;
-    SendPacket(socket, p_size);
+    SendPacket(socket, p_info->cross_traffic_s);
 
-    Simulator::Schedule(MicroSeconds(rate), &GenerateCrossTraffic, socket, rate, p_size);
+    Simulator::Schedule(MicroSeconds(rate), &GenerateCrossTraffic, p_info, socket, rate);
 }
 
+//Measures the queue length of a given queue, every 0.5 microseconds
 void traceQueueLength(Ptr<Queue<Packet>> queue, int measurement) {
+    packet_trains--;
     if (measurement < 1) return;
     file << queue->GetCurrentSize().GetValue() << ",";
     file << 400-measurement << "\n";
-    Simulator::Schedule(MicroSeconds(5), &traceQueueLength, queue, measurement-1);
+    Simulator::Schedule(MicroSeconds(100), &traceQueueLength, queue, measurement-1);
+}
+
+void setup_packet_info(packet_info *p_info,
+                       uint32_t ps_heading,
+                       uint32_t ps_trailing,
+                       uint32_t ps_cross,
+                       uint16_t link_cap
+){
+    p_info->heading_s = ps_heading-30;
+    p_info->trailing_s = ps_trailing-30;
+    p_info->cross_traffic_s = ps_cross;
+    p_info->link_cap = link_cap;
 }
 
 int main(int argc, char* argv[]) {
     CommandLine cmd(__FILE__);
     cmd.Parse(argc, argv);
+
+    if (argc < 5) {
+        std::cout << "Usage: ";
+        std::cout << "./ns3 one-intermediate [packet size heading packet] ";
+        std::cout << "[packet size trailing packet] [packet size cross traffic packets] [Link capacity in Mps]\n";
+        return -1;
+    }
+
+    packet_info p_info;
+    setup_packet_info(&p_info,
+                      std::atoi(argv[1]),
+                      std::atoi(argv[2]),
+                      std::atoi(argv[3]),
+                      std::atoi(argv[4]));
+
+
+    printf("Heading: %d trailing: %d cross: %d \n", p_info.heading_s, p_info.trailing_s, p_info.cross_traffic_s);
+
+    uint32_t rates[4];
+    if (p_info.link_cap == 1000){
+        uint32_t t_rates[4] = RATES_1GB;
+        std::memcpy(rates, t_rates, 4*sizeof(uint32_t));
+    } else {
+        uint32_t t_rates[4] = RATES_100MB;
+        std::memcpy(rates, t_rates, 4*sizeof(uint32_t));
+    }
+
+    printf("rates: %d %d %d %d\n", rates[0], rates[1], rates[2], rates[3]);
+
+    uint32_t time_interval[] = {
+            (p_info.cross_traffic_s * 8) / rates[0],
+            (p_info.cross_traffic_s * 8) / rates[1],
+            (p_info.cross_traffic_s * 8) / rates[2],
+            (p_info.cross_traffic_s * 8) / rates[3],
+    };
+
+    printf("%d %d %d %d\n", time_interval[0], time_interval[1], time_interval[2], time_interval[3]);
 
     Time::SetResolution(Time::NS);
 
@@ -84,10 +140,9 @@ int main(int argc, char* argv[]) {
 
     InternetStackHelper stack;
     stack.Install(nodes);
-
     PointToPointHelper pointToPoint;
-    pointToPoint.SetDeviceAttribute("DataRate", StringValue("1Gbps"));
-    pointToPoint.SetChannelAttribute("Delay", StringValue("10ms"));
+    pointToPoint.SetDeviceAttribute("DataRate", StringValue(std::strcat(argv[4], "Mbps")));
+    pointToPoint.SetChannelAttribute("Delay", StringValue("2ms"));
 
     //End-to-end path
     NodeContainer ab = NodeContainer(nodes.Get(0), nodes.Get(1));
@@ -152,29 +207,31 @@ int main(int argc, char* argv[]) {
 
     Ptr<Socket> crossTraffic1 = Socket::CreateSocket(nodes.Get(3), UdpSocketFactory::GetTypeId());
     crossTraffic1->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic1->Connect(InetSocketAddress(interfaces2.GetAddress(1), 9));
+    crossTraffic1->Connect(InetSocketAddress(interfaces2.GetAddress(1), 8));
 
     Ptr<Socket> crossTraffic2 = Socket::CreateSocket(nodes.Get(4), UdpSocketFactory::GetTypeId());
     crossTraffic2->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic2->Connect(InetSocketAddress(interfaces2.GetAddress(1), 9));
+    crossTraffic2->Connect(InetSocketAddress(interfaces2.GetAddress(1), 8));
 
     Ptr<Socket> crossTraffic3 = Socket::CreateSocket(nodes.Get(5), UdpSocketFactory::GetTypeId());
     crossTraffic3->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic3->Connect(InetSocketAddress(interfaces2.GetAddress(1), 9));
+    crossTraffic3->Connect(InetSocketAddress(interfaces2.GetAddress(1), 8));
 
     Ptr<Socket> crossTraffic4 = Socket::CreateSocket(nodes.Get(6), UdpSocketFactory::GetTypeId());
     crossTraffic4->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
     crossTraffic4->Connect(InetSocketAddress(interfaces2.GetAddress(1), 9));
 
-    pointToPoint.EnablePcapAll("parallel-traffic");
+    pointToPoint.EnablePcapAll("one-intermediate");
 
     AnimationInterface anim("animation.xml");
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic1, 10, 400);
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic2, 15, 400);
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic3, 20, 400);
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic4, 20, 400);
-    Simulator::Schedule(Seconds(2.0), &SendTrainOfPackets, source, 5);
-    Simulator::Schedule(MilliSeconds(2002), &traceQueueLength, queue, 400);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info,  crossTraffic1, time_interval[0]);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic2, time_interval[1]);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic3, time_interval[2]);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic,&p_info,  crossTraffic4, time_interval[3]);
+
+
+    //Simulator::Schedule(Seconds(2.0), &SendTrainOfPackets, p_info, source, 5);
+    Simulator::Schedule(MilliSeconds(2002), &traceQueueLength, queue, 100);
     Simulator::Run();
     Simulator::Destroy();
     file.close();

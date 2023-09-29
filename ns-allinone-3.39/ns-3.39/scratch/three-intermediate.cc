@@ -12,15 +12,13 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE("OneIntermediateNode");
-
-std::ofstream file("queue-size-1.csv");
+NS_LOG_COMPONENT_DEFINE("ThreeIntermediateNodes");
 
 std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_int_distribution<> dis(1, 5);
 
-int packet_trains = 400;
+int packet_trains = 500;
 
 void SendPacket(Ptr<Socket> socket, int packet_size) {
     socket->SetIpTtl(64); //Standard ttl value
@@ -36,9 +34,9 @@ void SendPacketWithTTL(Ptr<Socket> socket, int packet_size, int ttl) {
 }
 
 void SendTrainOfPackets(Ptr<Socket> socket, int ttl) {
-    if (packet_trains % 50 == 0)std::cout<<packet_trains<<std::endl;
+    if (packet_trains % 50 == 0) std::cout<<packet_trains<<std::endl;
     if (packet_trains < 1) return;
-    //SendPacketWithTTL(socket, 2048, ttl);
+    SendPacketWithTTL(socket, 2048, ttl);
     SendPacket(socket, 64);
     SendPacket(socket, 800);
     packet_trains--;
@@ -53,12 +51,11 @@ void GenerateCrossTraffic(Ptr<Socket> socket, int rate, int p_size) {
     Simulator::Schedule(MicroSeconds(rate), &GenerateCrossTraffic, socket, rate, p_size);
 }
 
-void traceQueueLength(Ptr<Queue<Packet>> queue, int measurement) {
+void traceQueueLength(Ptr<Queue<Packet>> queue, int measurement, std::ofstream *file) {
     if (measurement < 1) return;
-    packet_trains--;
-    file << queue->GetCurrentSize().GetValue() << ",";
-    file << 400-measurement << "\n";
-    Simulator::Schedule(MicroSeconds(5), &traceQueueLength, queue, measurement-1);
+    *file << queue->GetCurrentSize().GetValue() << ",";
+    *file << 400-measurement << "\n";
+    Simulator::Schedule(MicroSeconds(5), &traceQueueLength, queue, measurement-1, file);
 }
 
 int main(int argc, char* argv[]) {
@@ -100,7 +97,7 @@ int main(int argc, char* argv[]) {
 
     PointToPointHelper pointToPoint;
     pointToPoint.SetDeviceAttribute("DataRate", StringValue("1Gbps"));
-    pointToPoint.SetChannelAttribute("Delay", StringValue("10ms"));
+    pointToPoint.SetChannelAttribute("Delay", StringValue("2ms"));
 
     //End-to-end path
     NodeContainer ab = NodeContainer(nodes.Get(0), nodes.Get(1));
@@ -148,6 +145,12 @@ int main(int argc, char* argv[]) {
 
     Ptr<PointToPointNetDevice> netDevice = DynamicCast<PointToPointNetDevice>(devices2.Get(0));
     Ptr<Queue<Packet>> queue = netDevice->GetQueue();
+
+    Ptr<PointToPointNetDevice> netDevice2 = DynamicCast<PointToPointNetDevice>(devices3.Get(0));
+    Ptr<Queue<Packet>> queue2 = netDevice->GetQueue();
+
+    Ptr<PointToPointNetDevice> netDevice3 = DynamicCast<PointToPointNetDevice>(devices4.Get(0));
+    Ptr<Queue<Packet>> queue3 = netDevice->GetQueue();
 
     TrafficControlHelper tch;
     tch.SetRootQueueDisc("ns3::FifoQueueDisc");
@@ -233,59 +236,59 @@ int main(int argc, char* argv[]) {
 
     //Cross traffic node 1
     Ptr<Socket> crossTraffic1 = Socket::CreateSocket(nodes.Get(5), UdpSocketFactory::GetTypeId());
-    crossTraffic1->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic1->Connect(InetSocketAddress(interfaces5.GetAddress(0), 9));
+    crossTraffic1->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
+    crossTraffic1->Connect(InetSocketAddress(interfaces9.GetAddress(0), 8));
 
     Ptr<Socket> crossTraffic2 = Socket::CreateSocket(nodes.Get(6), UdpSocketFactory::GetTypeId());
-    crossTraffic2->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic2->Connect(InetSocketAddress(interfaces6.GetAddress(0), 9));
+    crossTraffic2->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
+    crossTraffic2->Connect(InetSocketAddress(interfaces10.GetAddress(0), 8));
 
     Ptr<Socket> crossTraffic3 = Socket::CreateSocket(nodes.Get(7), UdpSocketFactory::GetTypeId());
-    crossTraffic3->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic3->Connect(InetSocketAddress(interfaces7.GetAddress(0), 9));
+    crossTraffic3->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
+    crossTraffic3->Connect(InetSocketAddress(interfaces11.GetAddress(0), 8));
 
     Ptr<Socket> crossTraffic4 = Socket::CreateSocket(nodes.Get(8), UdpSocketFactory::GetTypeId());
-    crossTraffic4->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic4->Connect(InetSocketAddress(interfaces8.GetAddress(0), 9));
+    crossTraffic4->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
+    crossTraffic4->Connect(InetSocketAddress(interfaces12.GetAddress(0), 8));
 
     //Cross traffic node 2
     Ptr<Socket> crossTraffic5 = Socket::CreateSocket(nodes.Get(9), UdpSocketFactory::GetTypeId());
-    crossTraffic5->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic5->Connect(InetSocketAddress(interfaces9.GetAddress(0), 9));
+    crossTraffic5->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
+    crossTraffic5->Connect(InetSocketAddress(interfaces13.GetAddress(0), 8));
 
     Ptr<Socket> crossTraffic6 = Socket::CreateSocket(nodes.Get(10), UdpSocketFactory::GetTypeId());
-    crossTraffic6->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic6->Connect(InetSocketAddress(interfaces10.GetAddress(0), 9));
+    crossTraffic6->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
+    crossTraffic6->Connect(InetSocketAddress(interfaces14.GetAddress(0), 8));
 
     Ptr<Socket> crossTraffic7 = Socket::CreateSocket(nodes.Get(11), UdpSocketFactory::GetTypeId());
-    crossTraffic7->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic7->Connect(InetSocketAddress(interfaces11.GetAddress(0), 9));
+    crossTraffic7->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
+    crossTraffic7->Connect(InetSocketAddress(interfaces15.GetAddress(0), 8));
 
     Ptr<Socket> crossTraffic8 = Socket::CreateSocket(nodes.Get(12), UdpSocketFactory::GetTypeId());
-    crossTraffic8->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic8->Connect(InetSocketAddress(interfaces12.GetAddress(0), 9));
+    crossTraffic8->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
+    crossTraffic8->Connect(InetSocketAddress(interfaces16.GetAddress(0), 8));
 
     //Cross traffic node 3
     Ptr<Socket> crossTraffic9 = Socket::CreateSocket(nodes.Get(13), UdpSocketFactory::GetTypeId());
-    crossTraffic9->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic9->Connect(InetSocketAddress(interfaces4.GetAddress(1), 9));
+    crossTraffic9->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
+    crossTraffic9->Connect(InetSocketAddress(interfaces4.GetAddress(1), 8));
 
     Ptr<Socket> crossTraffic10 = Socket::CreateSocket(nodes.Get(14), UdpSocketFactory::GetTypeId());
-    crossTraffic10->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic10->Connect(InetSocketAddress(interfaces4.GetAddress(1), 9));
+    crossTraffic10->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
+    crossTraffic10->Connect(InetSocketAddress(interfaces4.GetAddress(1), 8));
 
     Ptr<Socket> crossTraffic11 = Socket::CreateSocket(nodes.Get(15), UdpSocketFactory::GetTypeId());
-    crossTraffic11->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic11->Connect(InetSocketAddress(interfaces4.GetAddress(1), 9));
+    crossTraffic11->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
+    crossTraffic11->Connect(InetSocketAddress(interfaces4.GetAddress(1), 8));
 
     Ptr<Socket> crossTraffic12 = Socket::CreateSocket(nodes.Get(16), UdpSocketFactory::GetTypeId());
-    crossTraffic12->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic12->Connect(InetSocketAddress(interfaces4.GetAddress(1), 9));
+    crossTraffic12->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
+    crossTraffic12->Connect(InetSocketAddress(interfaces4.GetAddress(1), 8));
 
 
-    pointToPoint.EnablePcapAll("parallel-traffic");
-
+    pointToPoint.EnablePcapAll("three-intermediate");
     AnimationInterface anim("animation2.xml");
+
     Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic1, 10, 400);
     Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic2, 15, 400);
     Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic3, 20, 400);
@@ -301,10 +304,18 @@ int main(int argc, char* argv[]) {
     Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic11, 20, 400);
     Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic12, 20, 400);
 
-    //Simulator::Schedule(Seconds(2.0), &SendTrainOfPackets, source, 5);
-    Simulator::Schedule(MilliSeconds(2010), &traceQueueLength, queue, 400);
+    std::ofstream file1("queue-1.csv");
+    std::ofstream file2("queue-2.csv");
+    std::ofstream file3("queue-3.csv");
+
+    Simulator::Schedule(Seconds(2.0), &SendTrainOfPackets, source, 3);
+    Simulator::Schedule(MilliSeconds(2003), &traceQueueLength, queue, 400, &file1);
+    Simulator::Schedule(MilliSeconds(2003), &traceQueueLength, queue2, 400, &file2);
+    Simulator::Schedule(MilliSeconds(2003), &traceQueueLength, queue3, 400, &file3);
     Simulator::Run();
     Simulator::Destroy();
-    file.close();
+    file1.close();
+    file2.close();
+    file3.close();
     return 0;
 }

@@ -1,14 +1,19 @@
 from scapy.all import *
+import sys
 
 def extract_packet_size():
-    file = open("probes.csv", "w+")
+    if (len(sys.argv) < 3):
+        print("Too few arguments")
+        return -1
+
+    file = open(sys.argv[1], "w+")
     print(""+
         "===============\n"+
         "    Reading    \n"+
         "==============="
 
     )
-    packets = rdpcap("parallel-traffic-1-2.pcap")
+    packets = rdpcap(sys.argv[2])
 
     print(""+
         "===============\n"+
@@ -19,7 +24,7 @@ def extract_packet_size():
 
     for packet in packets:
         l = len(packet)
-        if l == 94 or l ==830:
+        if l == 64 or l ==800:
             file.write(str(l)+","+("%.12f" % packet.time)+"\n")
 
 

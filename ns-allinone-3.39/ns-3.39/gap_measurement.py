@@ -1,5 +1,11 @@
-file_in = open("probes.csv", "r+")
-file_out = open("probe_gaps.csv", "w+")
+import sys
+
+if len(sys.argv) < 2:
+    print("To few arguments, expected: filepath1.csv filepath2.csv")
+    exit(-1)
+
+file_in = open(sys.argv[1], "r+")
+file_out = open(sys.argv[2], "w+")
 
 file_out.write("Pair,Gap\n")
 hp = None

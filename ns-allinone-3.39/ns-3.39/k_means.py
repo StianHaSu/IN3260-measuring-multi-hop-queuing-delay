@@ -83,5 +83,3 @@ total += delay_de*s_de
 print("\n")
 
 print(f"Queueing delay: {total*(10**6)} micro seconds")
-
-
