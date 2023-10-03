@@ -6,6 +6,7 @@ def extract_packet_size():
         print("Too few arguments")
         return -1
 
+    #Opening output file
     file = open(sys.argv[1], "w+")
     print(""+
         "===============\n"+
@@ -13,6 +14,8 @@ def extract_packet_size():
         "==============="
 
     )
+
+    #Reading in the pcap file
     packets = rdpcap(sys.argv[2])
 
     print(""+
@@ -22,10 +25,11 @@ def extract_packet_size():
 
     )
 
+    #Filtering out the probing packets based on packetsize
     for packet in packets:
         l = len(packet)
-        if l == 64 or l ==800:
-            file.write(str(l)+","+("%.12f" % packet.time)+"\n")
+        if l == 64 or l == 800:
+            file.write(str(l)+","+("%.6f" % packet.time)+"\n")
 
 
 extract_packet_size()

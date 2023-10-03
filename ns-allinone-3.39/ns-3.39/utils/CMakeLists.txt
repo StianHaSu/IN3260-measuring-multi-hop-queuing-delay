@@ -13,7 +13,8 @@ if(${ENABLE_TESTS})
 
     # Define the libtest as an object to build test-runner
     set(test_sources $<TARGET_OBJECTS:${libtest}>
-            ../include/packet_info.h)
+            ../include/packet_info.h
+            ../common.cpp)
   endif()
 
   if(WIN32)

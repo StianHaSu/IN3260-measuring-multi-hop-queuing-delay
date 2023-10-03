@@ -7,6 +7,8 @@
 #include "ns3/netanim-module.h"
 #include "../src/mobility/helper/mobility-helper.h"
 #include "../src/mobility/model/constant-position-mobility-model.h"
+#include "../include/packet_info.h"
+#include "../common.cpp"
 #include <random>
 
 
@@ -14,59 +16,26 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE("ThreeIntermediateNodes");
 
-std::random_device rd;
-std::mt19937 gen(rd());
-std::uniform_int_distribution<> dis(1, 5);
-
-int packet_trains = 500;
-
-void SendPacket(Ptr<Socket> socket, int packet_size) {
-    socket->SetIpTtl(64); //Standard ttl value
-    Ptr<ns3::Packet> packet = Create<Packet>(packet_size);
-    socket->Send(packet);
-}
-
-void SendPacketWithTTL(Ptr<Socket> socket, int packet_size, int ttl) {
-    socket->SetIpTtl(ttl);
-    
-    Ptr<Packet> packet = Create<Packet>(packet_size);
-    socket->Send(packet);
-}
-
-void SendTrainOfPackets(Ptr<Socket> socket, int ttl) {
-    if (packet_trains % 50 == 0) std::cout<<packet_trains<<std::endl;
-    if (packet_trains < 1) return;
-    SendPacketWithTTL(socket, 2048, ttl);
-    SendPacket(socket, 64);
-    SendPacket(socket, 800);
-    packet_trains--;
-
-    Simulator::Schedule(MilliSeconds(dis(gen)*10), &SendTrainOfPackets, socket, ttl);
-}
-
-void GenerateCrossTraffic(Ptr<Socket> socket, int rate, int p_size) {
-    if (packet_trains < 1) return;
-    SendPacket(socket, p_size);
-
-    Simulator::Schedule(MicroSeconds(rate), &GenerateCrossTraffic, socket, rate, p_size);
-}
-
-void traceQueueLength(Ptr<Queue<Packet>> queue, int measurement, std::ofstream *file) {
-    if (measurement < 1) return;
-    *file << queue->GetCurrentSize().GetValue() << ",";
-    *file << 400-measurement << "\n";
-    Simulator::Schedule(MicroSeconds(5), &traceQueueLength, queue, measurement-1, file);
-}
-
 int main(int argc, char* argv[]) {
     CommandLine cmd(__FILE__);
     cmd.Parse(argc, argv);
+
+    packet_info p_info;
+    setup_packet_info(&p_info,
+                      std::atoi(argv[1]),
+                      std::atoi(argv[2]),
+                      std::atoi(argv[3]),
+                      std::atoi(argv[4]));
+
+
+    uint32_t *time_interval = calculateTimeIntervals(&p_info);
+    printf("Heading: %u Trailing: %u Cross: %u Link: %u \n",p_info.heading_s, p_info.trailing_s, p_info.cross_traffic_s, p_info.link_cap);
+    printf("%u %u %u %u\n",time_interval[0], time_interval[1], time_interval[2], time_interval[3]);
 
     Time::SetResolution(Time::NS);
 
     NodeContainer nodes;
     nodes.Create(17);
-
     MobilityHelper mobility;
     mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
     mobility.Install(nodes);
@@ -289,26 +258,25 @@ int main(int argc, char* argv[]) {
     pointToPoint.EnablePcapAll("three-intermediate");
     AnimationInterface anim("animation2.xml");
 
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic1, 10, 400);
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic2, 15, 400);
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic3, 20, 400);
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic4, 20, 400);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic1, time_interval[0]);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic2, time_interval[1]);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic3, time_interval[2]);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic4, time_interval[3]);
 
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic5, 10, 400);
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic6, 15, 400);
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic7, 20, 400);
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic8, 20, 400);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic5, time_interval[0]);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic6, time_interval[1]);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic7, time_interval[2]);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic8, time_interval[3]);
 
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic9, 10, 400);
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic10, 15, 400);
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic11, 20, 400);
-    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, crossTraffic12, 20, 400);
-
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic9, time_interval[0]);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic10, time_interval[1]);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic11, time_interval[2]);
+    Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic12, time_interval[3]);
     std::ofstream file1("queue-1.csv");
     std::ofstream file2("queue-2.csv");
     std::ofstream file3("queue-3.csv");
 
-    Simulator::Schedule(Seconds(2.0), &SendTrainOfPackets, source, 3);
+    Simulator::Schedule(Seconds(2.0), &SendTrainOfPackets, &p_info, source, 2);
     Simulator::Schedule(MilliSeconds(2003), &traceQueueLength, queue, 400, &file1);
     Simulator::Schedule(MilliSeconds(2003), &traceQueueLength, queue2, 400, &file2);
     Simulator::Schedule(MilliSeconds(2003), &traceQueueLength, queue3, 400, &file3);

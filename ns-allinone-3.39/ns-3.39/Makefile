@@ -15,13 +15,13 @@ alternativeTopology:
 	./ns3 run scratch/alternative-topology
 
 simulateAndMeasureDelay1:
-	./ns3 run scratch/one-intermediate -- 34 770 370
-	python3 filter_packets.py probes.csv one-intermediate-1-2.pcap
-	python3 gap_measurement.py probes.csv probe-gaps-one.csv
+	./ns3 run scratch/one-intermediate -- 64 800 900 1000
+	python3 filter_packets.py probes-one.csv one-intermediate-1-2.pcap
+	python3 gap_measurement.py probes-one.csv probe-gaps-one.csv
 	python3 k_means.py probe-gaps-one.csv
 
 simulateAndMeasureDelay3:
-	./ns3 run scratch/three-intermediate
+	./ns3 run scratch/three-intermediate -- 64 800 900 100
 	python3 filter_packets.py probes-three.csv three-intermediate-4-1.pcap
-	python3 gap_measurement.py probe-three.csv probe-gaps-three.csv
-	python3 k_means.py
+	python3 gap_measurement.py probes-three.csv probe-gaps-three.csv
+	python3 k_means.py probe-gaps-three.csv
