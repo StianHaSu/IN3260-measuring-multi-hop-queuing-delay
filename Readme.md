@@ -29,6 +29,15 @@
 - [x] Measure queueing delay on the last intermediate node 
 - [ ] Measure cumulative queueing delay on three intermediate nodes.
 
+### Week 40
+Working on automating the simulation and measuring proccess. This included making a pipeline  
+that automatically runs the filtering, gap measuring, and kmeans programs automtically after each simulation run.  
+
+### Week 41  
+- [x] Make a system that runs the entire simulation proccess, and then creates complete graph data.
+- [ ] Create graph data for all 100Mbps combinations.
+- [ ] Create graph data for all 1Gbps combinations.
+
 ## References
 
 [1] Ricker, Travis, et al. "A Machine Learning Approach to Estimating Queuing Delay on a Router over a Single-Hop Path." ICC 2022-IEEE International Conference on Communications. IEEE, 2022. <br />
