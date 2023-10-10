@@ -35,8 +35,8 @@ that automatically runs the filtering, gap measuring, and kmeans programs automt
 
 ### Week 41  
 - [x] Make a system that runs the entire simulation proccess, and then creates complete graph data.
-- [ ] Create graph data for all 100Mbps combinations.
-- [ ] Create graph data for all 1Gbps combinations.
+- [x] Create graph data for all 100Mbps combinations.
+- [ ] Create graph data for all 1Gbps combinations. (This will not be done by wednesday, as the simulations are taking to long.)
 
 ## References
 
