@@ -2,7 +2,33 @@ import pandas as pd
 from sklearn.cluster import KMeans
 import numpy as np
 from sklearn.preprocessing import StandardScaler
+from graph_utils import update_value 
 import sys
+import math
+from Cluster import CustomCluster
+
+output_file = sys.argv[2]
+row_to_update = int(sys.argv[3])
+
+def calculate_vaiability(cluster_co, cluster_dc, queueing_delay):    
+    variability_co = 0
+    for _, element in cluster_co.cluster.iterrows():
+        variability_co += ((float(element['Gap'])*10**6)-queueing_delay)**2
+
+    variability_dc = 0
+    for _, element in cluster_dc.cluster.iterrows():
+        variability_dc += ((float(element['Gap'])*10**6)-queueing_delay)**2
+
+    combined_variability = math.sqrt((variability_co + variability_dc)/(len(cluster_dc.cluster) + len(cluster_co.cluster)))
+
+    return combined_variability
+
+def simple_var(cluster_co, cluster_dc, queueing_delay):
+    variability = (cluster_co.centroid*10**6 - queueing_delay)**2
+    variability += (cluster_dc.centroid*10**6 - queueing_delay)**2
+    
+    combined = math.sqrt(variability/(len(cluster_co.cluster)+len(cluster_dc.cluster)))
+    return combined
 
 #Filters out intra-probe gaps that has a frequency 
 #of less than 20% in a given cluster
@@ -55,29 +81,38 @@ grouped_clusters2 = result.groupby('Cluster')
 #Get the centroids of each cluster
 centroids = kmeans2.cluster_centers_
 
-#Map each centroids value to the size of its cluster
-centroid_map = {}
-centroid_map[centroids[0,0]] = len(grouped_clusters2.get_group(0))
-centroid_map[centroids[1,0]] = len(grouped_clusters2.get_group(1))
-centroid_map[centroids[2,0]] = len(grouped_clusters2.get_group(2))
+#Getting the processed clusters
+processed_cluster_1 = grouped_clusters2.get_group(0)
+processed_cluster_2 = grouped_clusters2.get_group(1)
+processed_cluster_3 = grouped_clusters2.get_group(2)
 
-#Sort centroids into no-change, compression and decompression
-for i in range(1,3):
-    j = i
-    while j > 0 and centroids[j-1,0] > centroids[j, 0]:
-        centroids[j, :], centroids[j-1, :] = centroids[j-1, :].copy(), centroids[j, :].copy() 
-        j -= 1
+cluster1 = CustomCluster(centroids[0,0], processed_cluster_1)
+cluster2 = CustomCluster(centroids[1,0], processed_cluster_2)
+cluster3 = CustomCluster(centroids[2,0], processed_cluster_3)
+
+cluster_map = {
+    cluster1.centroid : cluster1,
+    cluster2.centroid : cluster2,
+    cluster3.centroid : cluster3 
+}
+
+cluster_list = [cluster1.centroid, cluster2.centroid, cluster3.centroid]
+cluster_list.sort()
 
 print("\n")
 
+co = cluster_map[cluster_list[0]]
+nc = cluster_map[cluster_list[1]]
+de = cluster_map[cluster_list[2]]
+
 #Print out the value of each centroid, in seconds
-print("Compression centroid: ", centroids[0,0])
-print("No change centroid: ", centroids[1,0])
-print("Decompression centroid: ", centroids[2,0])
+print("Compression centroid: ", co.centroid)
+print("No change centroid: ", nc.centroid)
+print("Decompression centroid: ", de.centroid)
 
 #Calculate delay due to compression and decompression
-delay_co = centroids[1,0]-centroids[0,0]
-delay_de = centroids[2,0]-centroids[1,0]
+delay_co = nc.centroid-co.centroid
+delay_de = de.centroid-nc.centroid
 
 print("\n")
 
@@ -89,11 +124,21 @@ print("\n")
 total = 0
 
 #Calculate the weighted cluster size of the compression and decompression clusters
-s_co = centroid_map[centroids[0,0]] / (centroid_map[centroids[0,0]] + centroid_map[centroids[2,0]])
-s_de = centroid_map[centroids[2,0]] / (centroid_map[centroids[0,0]] + centroid_map[centroids[2,0]])
+s_co = len(co.cluster) / (len(co.cluster) + len(de.cluster))
+s_de = len(de.cluster) / (len(co.cluster) + len(de.cluster))
 
 total += delay_co*s_co
 total += delay_de*s_de
 
+total *= 10**6
 #Print out the resulting queuing delay in microseconds
-print(f"Queueing delay: {total*(10**6)} micro seconds")
+print(f"Queueing delay: {total} micro seconds")
+
+variability = simple_var(co, de, total)
+
+print("\n")
+
+print(f"Variability: {variability}")
+
+update_value(output_file, row_to_update, "M_d", "%.2f" % total)
+update_value(output_file, row_to_update, "M_v", "%.2f" % variability)

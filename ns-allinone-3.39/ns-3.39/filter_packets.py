@@ -9,27 +9,21 @@ def extract_packet_size():
     #Opening output file
     file = open(sys.argv[1], "w+")
     print(""+
-        "===============\n"+
-        "    Reading    \n"+
-        "==============="
-
+        "================\n"+
+        "     Reading    \n"+
+        "================"
     )
 
-    #Reading in the pcap file
-    packets = rdpcap(sys.argv[2])
-
-    print(""+
-        "===============\n"+
-        "    Finished   \n"+
-        "==============="
-
-    )
-
+    trailing_packet_size = int(sys.argv[3])
+    print(f"\n Filtering packets with size 64 and {trailing_packet_size}")
+    
     #Filtering out the probing packets based on packetsize
-    for packet in packets:
-        l = len(packet)
-        if l == 64 or l == 800:
-            file.write(str(l)+","+("%.6f" % packet.time)+"\n")
+    with PcapReader(sys.argv[2]) as pcap_reader:
+        for packet in pcap_reader:
+            l = len(packet)
+            if l == 64 or l == trailing_packet_size:
+                file.write(str(l)+","+("%.6f" % packet.time)+"\n")
 
+    file.close()
 
 extract_packet_size()

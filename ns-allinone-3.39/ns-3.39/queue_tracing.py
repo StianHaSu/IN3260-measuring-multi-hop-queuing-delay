@@ -16,5 +16,7 @@ for l in file:
     xs.append(int(bits[0]))
     ys.append(int(bits[1]))
 
-plt.plot(ys, xs)
+plt.plot(ys, xs, color="black")
+plt.yticks(range(max(xs)+2))
+plt.tight_layout(pad=2.0) 
 plt.show()

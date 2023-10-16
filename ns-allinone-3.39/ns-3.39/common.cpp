@@ -20,7 +20,7 @@ std::mt19937 gen(rd());
 std::uniform_int_distribution<> dis(1, 5);
 
 
-int packet_trains = 400;
+int packet_trains = 500;
 
 uint32_t* calculateTimeIntervals(packet_info *p_info) {
     uint32_t rates[4];
@@ -31,6 +31,8 @@ uint32_t* calculateTimeIntervals(packet_info *p_info) {
         uint32_t t_rates[4] = RATES_100MB;
         std::memcpy(rates, t_rates, 4*sizeof(uint32_t));
     }
+
+    printf("Cross traffic rates: %dMbps %dMbps %dMbps %dMbps\n", rates[0], rates[1], rates[2], rates[3]);
 
     uint32_t time_interval[] = {
             (p_info->cross_traffic_s * 8) / rates[0],
@@ -60,16 +62,16 @@ void SendPacketWithTTL(Ptr<Socket> socket, int packet_size, int ttl) {
 }
 
 //Sends a train of packets i.e the compound probe
-void SendTrainOfPackets(packet_info *p_info, Ptr<Socket> socket, int ttl) {
+void SendProbingPacket(packet_info *p_info, Ptr<Socket> socket, int ttl, int rate) {
     if (packet_trains % 50 == 0) { std::cout<<packet_trains<<std::endl; }
 
     if (packet_trains < 1) return;
-    SendPacketWithTTL(socket, 3500, ttl);
+    if (ttl > 0) { SendPacketWithTTL(socket, 3500, ttl); }
     SendPacket(socket, p_info->heading_s);
     SendPacket(socket, p_info->trailing_s);
     packet_trains--;
 
-    Simulator::Schedule(MilliSeconds(10), &SendTrainOfPackets, p_info, socket, ttl);
+    Simulator::Schedule(MilliSeconds(dis(gen)*rate), &SendProbingPacket, p_info, socket, ttl, rate);
 }
 
 //Sends packet with a given time interval and packet size
@@ -80,12 +82,12 @@ void GenerateCrossTraffic(packet_info *p_info, Ptr<Socket> socket, int rate) {
     Simulator::Schedule(MicroSeconds(rate), &GenerateCrossTraffic, p_info, socket, rate);
 }
 
-//Measures the queue length of a given queue, every 0.5 microseconds
-void traceQueueLength(Ptr<Queue<Packet>> queue, int measurement, std::ofstream *file) {
+//Measures the queue length of a given queue, every rate microseconds
+void traceQueueLength(Ptr<Queue<Packet>> queue, int measurement, std::ofstream *file, int rate) {
     if (measurement < 1) return;
     *file << queue->GetCurrentSize().GetValue() << ",";
     *file << 400-measurement << "\n";
-    Simulator::Schedule(NanoSeconds(500), &traceQueueLength, queue, measurement-1, file);
+    Simulator::Schedule(NanoSeconds(rate), &traceQueueLength, queue, measurement-1, file, rate);
 }
 
 void setup_packet_info(packet_info *p_info,

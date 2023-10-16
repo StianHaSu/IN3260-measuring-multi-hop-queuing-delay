@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
     stack.Install(nodes);
     PointToPointHelper pointToPoint;
     pointToPoint.SetDeviceAttribute("DataRate", StringValue(std::strcat(argv[4], "Mbps")));
-    pointToPoint.SetChannelAttribute("Delay", StringValue("2ms"));
+    pointToPoint.SetChannelAttribute("Delay", StringValue("5ms"));
 
     //End-to-end path
     NodeContainer ab = NodeContainer(nodes.Get(0), nodes.Get(1));
@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) {
 
     ApplicationContainer serverApps = server.Install(nodes.Get(2));
     serverApps.Start(Seconds(1.0));
-    serverApps.Stop(Seconds(3.0));
+    serverApps.Stop(Seconds(7.0));
 
     Ipv4GlobalRoutingHelper::PopulateRoutingTables();
 
@@ -122,30 +122,37 @@ int main(int argc, char* argv[]) {
 
     Ptr<Socket> crossTraffic1 = Socket::CreateSocket(nodes.Get(3), UdpSocketFactory::GetTypeId());
     crossTraffic1->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic1->Connect(InetSocketAddress(interfaces2.GetAddress(1), 8));
+    crossTraffic1->Connect(InetSocketAddress(interfaces2.GetAddress(1), 9));
 
     Ptr<Socket> crossTraffic2 = Socket::CreateSocket(nodes.Get(4), UdpSocketFactory::GetTypeId());
     crossTraffic2->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic2->Connect(InetSocketAddress(interfaces2.GetAddress(1), 8));
+    crossTraffic2->Connect(InetSocketAddress(interfaces2.GetAddress(1), 9));
 
     Ptr<Socket> crossTraffic3 = Socket::CreateSocket(nodes.Get(5), UdpSocketFactory::GetTypeId());
     crossTraffic3->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
-    crossTraffic3->Connect(InetSocketAddress(interfaces2.GetAddress(1), 8));
+    crossTraffic3->Connect(InetSocketAddress(interfaces2.GetAddress(1), 9));
 
     Ptr<Socket> crossTraffic4 = Socket::CreateSocket(nodes.Get(6), UdpSocketFactory::GetTypeId());
     crossTraffic4->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
     crossTraffic4->Connect(InetSocketAddress(interfaces2.GetAddress(1), 9));
 
-    pointToPoint.EnablePcapAll("one-intermediate");
+    pointToPoint.EnablePcap("one-intermediate", devices2.Get(0));
 
     AnimationInterface anim("animation.xml");
+
     Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info,  crossTraffic1, time_interval[0]);
     Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic2, time_interval[1]);
     Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic3, time_interval[2]);
     Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic,&p_info,  crossTraffic4, time_interval[3]);
 
-    Simulator::Schedule(MilliSeconds(2002), &SendTrainOfPackets, &p_info, source, 5);
-    Simulator::Schedule(MilliSeconds(2002), &traceQueueLength, queue, 100, &file);
+    //How often a queue measurement should be done given the link capacity
+    int queueMeasurementRate = p_info.link_cap == 100 ? 5000 : 500;
+
+    //How often a probing pair should be sent
+    int probingRate = p_info.link_cap == 100 ? 100 : 10;
+
+    Simulator::Schedule(MilliSeconds(2002), &SendProbingPacket, &p_info, source, 0, probingRate);
+    Simulator::Schedule(MilliSeconds(2100), &traceQueueLength, queue, 400, &file, queueMeasurementRate);
     Simulator::Run();
     Simulator::Destroy();
     file.close();

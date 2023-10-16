@@ -6,7 +6,8 @@
 #define NS3_PACKET_INFO_H
 
 #define RATES_100MB {47, 24, 16, 12}
-#define RATES_1GB {400, 267, 160, 160}
+//267
+#define RATES_1GB {400, 260, 160, 160}
 
 typedef struct packet_info {
     uint32_t heading_s;

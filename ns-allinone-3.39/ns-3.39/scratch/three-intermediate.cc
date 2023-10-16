@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
     stack.Install(nodes);
 
     PointToPointHelper pointToPoint;
-    pointToPoint.SetDeviceAttribute("DataRate", StringValue("1Gbps"));
+    pointToPoint.SetDeviceAttribute("DataRate", StringValue(std::strcat(argv[4], "Mbps")));
     pointToPoint.SetChannelAttribute("Delay", StringValue("2ms"));
 
     //End-to-end path
@@ -276,14 +276,21 @@ int main(int argc, char* argv[]) {
     std::ofstream file2("queue-2.csv");
     std::ofstream file3("queue-3.csv");
 
-    Simulator::Schedule(Seconds(2.0), &SendTrainOfPackets, &p_info, source, 2);
-    Simulator::Schedule(MilliSeconds(2003), &traceQueueLength, queue, 400, &file1);
-    Simulator::Schedule(MilliSeconds(2003), &traceQueueLength, queue2, 400, &file2);
-    Simulator::Schedule(MilliSeconds(2003), &traceQueueLength, queue3, 400, &file3);
+    //How often a queue measurement should be done (in nanoseconds) given the link capacity
+    int queueMeasurementRate = p_info.link_cap == 100 ? 5000 : 500;
+
+    //How often a probing pair should be sent (in milliseconds)
+    int probingRate = p_info.link_cap == 100 ? 100 : 10;
+
+    Simulator::Schedule(MilliSeconds(2004), &SendProbingPacket, &p_info, source, 3, probingRate);
+    Simulator::Schedule(MilliSeconds(2004), &traceQueueLength, queue, 400, &file1, queueMeasurementRate);
+    Simulator::Schedule(MilliSeconds(2004), &traceQueueLength, queue2, 400, &file2, queueMeasurementRate);
+    Simulator::Schedule(MilliSeconds(2004), &traceQueueLength, queue3, 400, &file3, queueMeasurementRate);
     Simulator::Run();
     Simulator::Destroy();
     file1.close();
     file2.close();
     file3.close();
+    free(time_interval);
     return 0;
 }
