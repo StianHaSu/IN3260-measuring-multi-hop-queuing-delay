@@ -27,7 +27,7 @@ def simple_var(cluster_co, cluster_dc, queueing_delay):
     variability = (cluster_co.centroid*10**6 - queueing_delay)**2
     variability += (cluster_dc.centroid*10**6 - queueing_delay)**2
     
-    combined = math.sqrt(variability/(len(cluster_co.cluster)+len(cluster_dc.cluster)))
+    combined = math.sqrt(variability/(len(cluster_co.cluster)+len(cluster_dc.cluster)-1))
     return combined
 
 #Filters out intra-probe gaps that has a frequency 
