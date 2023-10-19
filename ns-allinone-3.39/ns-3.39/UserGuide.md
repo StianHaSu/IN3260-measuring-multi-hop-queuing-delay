@@ -1,6 +1,6 @@
 # User guide for queueing delay measurement
 
-## File names and namin convetions
+## File names and naming convetions
 This project consist of multiple different parts, but can be broken into three
 main categories:  
 - NS3 Simulations which is responsible for creating the data that we analyze. Of
@@ -25,15 +25,17 @@ main categories:
     - ***[trailing packet size]-[cross traffic packet size]-[link capasity (in
       Mbps)]-[simulation run]***  
     Then a suffix based on which part of measurement process it belongs to:  
-    - ***results.csv*** contains packet information, link capasity, measured delay,
-      measured standard deviation, the real delay, and real standard deviation.  
-    - ***[one/three]-intermediate-1-2.pcap*** which is the tracefiles created by the
-      simulation itself, and contain information about all the packets sent. 
-    - ***queue-size.csv*** which is a measurement of the size of the queue which is
-      done during the simulation. This value is used to calculate the real
+    - ***results.csv*** contains packet information, link capasity, measured
+      delay, measured standard deviation, the real delay, and real standard
+      deviation.  
+    - ***[one/three]-intermediate-1-2.pcap*** which is the tracefiles created by
+      the simulation itself, and contain information about all the packets sent. 
+    - ***queue-size.csv*** which is a measurement of the size of the queue which
+      is done during the simulation. This value is used to calculate the real
       delay/standard deviation.  
-    - ***probes-[one/three].csv*** contains all the timestamps for all the probing
-      packets, after they have been filtered out in ***filter_packets.py***  
+    - ***probes-[one/three].csv*** contains all the timestamps for all the
+      probing packets, after they have been filtered out in
+      ***filter_packets.py***  
     - ***probe-gaps.csv*** which contains the measured distance between pairs of
       heading and trailing packets, this is used to estimate the queuing delay
       and standard deviation in ***k_means.py***
@@ -64,27 +66,48 @@ main categories:
 1. Set packet sizes and link capasity in the top of the Makefile  
 2. Run a simulation (Make (completeSimulation1))  
 3. prepare_simulation.py runs 
-    - (if this is the first simulation run) Creates a file with the naming convention mentioned in ***File names and namin convetions***  
-    - Updates the row in the file created, on the row corresponding to the simulation run with packet informatiom and link capasity.  
+    - (if this is the first simulation run) Creates a file with the naming
+      convention mentioned in ***File names and namin convetions***  
+    - Updates the row in the file created, on the row corresponding to the
+      simulation run with packet informatiom and link capasity.  
 3. one-intermediate.cc runs  
-    - 500 probing pairs are sent with with a distance of 50 - 250 ms between each pair.  
-    - Queue sizes are measured every 5 micro seconds, 400 times and the queue size at each measurement is written to the ***queue-size.csv*** file.  
-    - All packets being sent (including cross traffic packets) are traced and results in ***[trailing packet size]-[cross traffic packet size]-[link capasity (in
-      Mbps)]-[simulation run]-one-intermediate-1-2.pcap*** which is all the packets that reaches node threes interface connected to node two.  
+    - 500 probing pairs are sent with with a distance of 50 - 250 ms between
+      each pair.  
+    - Queue sizes are measured every 5 micro seconds, 400 times and the queue
+      size at each measurement is written to the ***queue-size.csv*** file.  
+    - All packets being sent (including cross traffic packets) are traced and
+      results in ***[trailing packet size]-[cross traffic packet size]-[link
+      capasity (in Mbps)]-[simulation run]-one-intermediate-1-2.pcap*** which is
+      all the packets that reaches node threes interface connected to node two.  
 4. filter_packets.py runs  
-    - All packets with size 64 bytes (Always the heading packet size) or the size of the trailing packet is filtered out, and the timestamp of their arrival at node 3 are written to the file probe file described in ***File names and namin convetions***.  
+    - All packets with size 64 bytes (Always the heading packet size) or the
+      size of the trailing packet is filtered out, and the timestamp of their
+      arrival at node 3 are written to the file probe file described in ***File
+      names and namin convetions***.  
 5. gap_measurement.py runs 
-    - The gap between pairs of heading and trailing packets are calculated and written to the probe-gaps.csv file described in ***File names and namin convetions***.  
+    - The gap between pairs of heading and trailing packets are calculated and
+      written to the probe-gaps.csv file described in ***File names and namin
+      convetions***.  
 6. k_means.py runs  
-    - The propagation delay of the trailing packet is subtracted from the measured gaps in the probe-gaps.csv file.  
+    - The propagation delay of the trailing packet is subtracted from the
+      measured gaps in the probe-gaps.csv file.  
     - The gaps are split into three clusters using the kmeans++ algorithm.   
-    - The clusters are filtered, where all gaps in the cluster with a frequency <20% is removed.  
+    - The clusters are filtered, where all gaps in the cluster with a frequency
+      <20% is removed.  
     - The clusters are reassigned with the filtered data.  
     - Queueing delay and standard deviation is calculated 
-    - The results are written to the results.csv file, on the row corresponding to the simulation round.
-7.steps 3 to 6 are repeated four more times.
+    - The results are written to the results.csv file, on the row corresponding
+to the simulation round.   
+7. 3 to 6 are repeated four more times.
 
-
-## Kmeans clustering and measured queueing delay
+## Clarifications and possible confusion
+1. If you see that the packet sizes are 30 bytes less than you expect in the
+simulation, this is most likely because the program subtracts 30 bytes from the
+packet sizes given as input.  
+The reason for this, is that when packets are sent, headers with a combined size
+of 30 bytes are  
+added to the packet. This ensures that the final packet size sent over the links
+are the excact  
+same size as the input.
 
 

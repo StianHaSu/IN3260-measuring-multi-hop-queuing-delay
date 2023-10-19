@@ -27,6 +27,20 @@ int main(int argc, char* argv[]) {
                       std::atoi(argv[3]),
                       std::atoi(argv[4]));
 
+    int simulation_round = std::atoi(argv[5]);
+    int ttl = std::atoi(argv[6]);
+
+    std::ostringstream oss;
+    oss << p_info.trailing_s+30 << "-" << p_info.cross_traffic_s << "-" << p_info.link_cap << "-" << simulation_round;
+    std::string base_queue_file = oss.str();
+
+    std::string queue1 = base_queue_file.append("-queue-size.csv-1.csv");
+    std::string queue2 = base_queue_file.append("-queue-size.csv-2.csv");
+    std::string queue3 = base_queue_file.append("-queue-size.csv-3.csv");
+
+    std::ofstream file1(queue1);
+    std::ofstream file2(queue2);
+    std::ofstream file3(queue3);
 
     uint32_t *time_interval = calculateTimeIntervals(&p_info);
     printf("Heading: %u Trailing: %u Cross: %u Link: %u \n",p_info.heading_s, p_info.trailing_s, p_info.cross_traffic_s, p_info.link_cap);
@@ -254,8 +268,11 @@ int main(int argc, char* argv[]) {
     crossTraffic12->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
     crossTraffic12->Connect(InetSocketAddress(interfaces4.GetAddress(1), 8));
 
+    std::ostringstream oss2;
+    oss2 << p_info.trailing_s+30 << "-" << p_info.cross_traffic_s << "-" << p_info.link_cap << "-" << simulation_round << "-three-intermediate";
+    std::string pcap_file = oss2.str();
+    pointToPoint.EnablePcap(pcap_file, devices4.Get(0));
 
-    pointToPoint.EnablePcapAll("three-intermediate");
     AnimationInterface anim("animation2.xml");
 
     Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic1, time_interval[0]);
@@ -272,9 +289,6 @@ int main(int argc, char* argv[]) {
     Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic10, time_interval[1]);
     Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic11, time_interval[2]);
     Simulator::Schedule(Seconds(2.0), &GenerateCrossTraffic, &p_info, crossTraffic12, time_interval[3]);
-    std::ofstream file1("queue-1.csv");
-    std::ofstream file2("queue-2.csv");
-    std::ofstream file3("queue-3.csv");
 
     //How often a queue measurement should be done (in nanoseconds) given the link capacity
     int queueMeasurementRate = p_info.link_cap == 100 ? 5000 : 500;
