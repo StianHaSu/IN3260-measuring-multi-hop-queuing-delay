@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
     int simulation_round = std::atoi(argv[5]);
 
     std::ostringstream oss;
-    oss << p_info.trailing_s+30 << "-" << p_info.cross_traffic_s << "-" << p_info.link_cap << "-queue-size.csv";
+    oss << p_info.trailing_s+30 << "-" << p_info.cross_traffic_s << "-" << p_info.link_cap << "-" << simulation_round << "-queue-size.csv";
     std::string queue_file = oss.str();
     std::ofstream file(queue_file);
 
