@@ -159,7 +159,7 @@ int main(int argc, char* argv[]) {
     //How often a probing pair should be sent
     int probingRate = p_info.link_cap == 100 ? 100 : 10;
 
-    Simulator::Schedule(MilliSeconds(2002), &SendProbingPacket, &p_info, source, ttl, probingRate);
+    Simulator::Schedule(MilliSeconds(2002), &SendProbingPacket, &p_info, source, 0, probingRate);
     Simulator::Schedule(MilliSeconds(2100), &traceQueueLength, queue, 400, &file, queueMeasurementRate);
     Simulator::Run();
     Simulator::Destroy();
