@@ -73,6 +73,16 @@ main categories:
       Mbps)]-[simulation run]-one-intermediate-1-2.pcap*** which is all the packets that reaches node threes interface connected to node two.  
 4. filter_packets.py runs  
     - All packets with size 64 bytes (Always the heading packet size) or the size of the trailing packet is filtered out, and the timestamp of their arrival at node 3 are written to the file probe file described in ***File names and namin convetions***.  
-5. 
+5. gap_measurement.py runs 
+    - The gap between pairs of heading and trailing packets are calculated and written to the probe-gaps.csv file described in ***File names and namin convetions***.  
+6. k_means.py runs  
+    - The propagation delay of the trailing packet is subtracted from the measured gaps in the probe-gaps.csv file.  
+    - The gaps are split into three clusters using the kmeans++ algorithm.   
+    - The clusters are filtered, where all gaps in the cluster with a frequency <20% is removed.  
+    - The clusters are reassigned with the filtered data.  
+    - Queueing delay and standard deviation is calculated 
+
+
+## Kmeans clustering and measured queueing delay
 
 
