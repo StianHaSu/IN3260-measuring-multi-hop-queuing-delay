@@ -19,7 +19,7 @@ def calculate_vaiability(cluster_co, cluster_dc, queueing_delay):
     for _, element in cluster_dc.cluster.iterrows():
         variability_dc += ((float(element['Gap'])*10**6)-queueing_delay)**2
 
-    combined_variability = math.sqrt((variability_co + variability_dc)/(len(cluster_dc.cluster) + len(cluster_co.cluster)))
+    combined_variability = math.sqrt((variability_co + variability_dc)/(len(cluster_dc.cluster) + len(cluster_co.cluster)-1))
 
     return combined_variability
 
@@ -44,7 +44,11 @@ def filter_group(group):
 
 #Creates clusters from an input file
 def create_groups(file):
+    packet_info = file.split("-")
     data = pd.read_csv(file)
+    
+    #Packet size * 8 / (link cap * 10**6)
+    data['Gap'] = data['Gap'] - ((float(packet_info[0])*8)/(float(packet_info[2])*10**6))
 
     kmeans = KMeans(n_clusters=3, init='k-means++', random_state=0)
     clusters = kmeans.fit_predict(data)
@@ -134,7 +138,7 @@ total *= 10**6
 #Print out the resulting queuing delay in microseconds
 print(f"Queueing delay: {total} micro seconds")
 
-variability = simple_var(co, de, total)
+variability = calculate_vaiability(co, de, total)
 
 print("\n")
 

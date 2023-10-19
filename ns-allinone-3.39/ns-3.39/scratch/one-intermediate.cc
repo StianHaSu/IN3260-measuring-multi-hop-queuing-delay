@@ -9,9 +9,9 @@
 #include "../src/mobility/model/constant-position-mobility-model.h"
 #include "../common.cpp"
 #include <string>
+#include <format>
 
 using namespace ns3;
-std::ofstream file("queue-size.csv");
 int main(int argc, char* argv[]) {
     CommandLine cmd(__FILE__);
     cmd.Parse(argc, argv);
@@ -30,6 +30,11 @@ int main(int argc, char* argv[]) {
                       std::atoi(argv[3]),
                       std::atoi(argv[4]));
 
+
+    std::ostringstream oss;
+    oss << p_info.trailing_s << "-" << p_info.cross_traffic_s << "-" << p_info.link_cap << "-queue-size.csv";
+    std::string queue_file = oss.str();
+    std::ofstream file(queue_file);
 
     uint32_t *time_interval = calculateTimeIntervals(&p_info);
     printf("Heading: %u Trailing: %u Cross: %u Link: %u \n",p_info.heading_s, p_info.trailing_s, p_info.cross_traffic_s, p_info.link_cap);
@@ -136,7 +141,10 @@ int main(int argc, char* argv[]) {
     crossTraffic4->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
     crossTraffic4->Connect(InetSocketAddress(interfaces2.GetAddress(1), 9));
 
-    pointToPoint.EnablePcap("one-intermediate", devices2.Get(0));
+    std::ostringstream oss2;
+    oss2 << p_info.trailing_s+30 << "-" << p_info.cross_traffic_s << "-" << p_info.link_cap << "-one-intermediate";
+    std::string pcap_file = oss2.str();
+    pointToPoint.EnablePcap(pcap_file, devices2.Get(0));
 
     AnimationInterface anim("animation.xml");
 
