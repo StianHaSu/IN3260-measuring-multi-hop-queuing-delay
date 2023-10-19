@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc /Users/stianhs/Documents/5.sem/IN3260/queuing_delay/ns-allinone-3.39/ns-3.39/build/lib/libscratch-nested-subdir-lib.a "CMakeFiles/scratch-nested-subdir-lib.dir/lib/scratch-nested-subdir-library-source.cc.o"
-/Library/Developer/CommandLineTools/usr/bin/ranlib /Users/stianhs/Documents/5.sem/IN3260/queuing_delay/ns-allinone-3.39/ns-3.39/build/lib/libscratch-nested-subdir-lib.a
