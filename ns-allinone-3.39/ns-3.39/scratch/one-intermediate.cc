@@ -29,9 +29,10 @@ int main(int argc, char* argv[]) {
                       std::atoi(argv[3]),
                       std::atoi(argv[4]));
 
+    int simulation_round = std::atoi(argv[5]);
 
     std::ostringstream oss;
-    oss << p_info.trailing_s << "-" << p_info.cross_traffic_s << "-" << p_info.link_cap << "-queue-size.csv";
+    oss << p_info.trailing_s+30 << "-" << p_info.cross_traffic_s << "-" << p_info.link_cap << "-queue-size.csv";
     std::string queue_file = oss.str();
     std::ofstream file(queue_file);
 
@@ -141,7 +142,7 @@ int main(int argc, char* argv[]) {
     crossTraffic4->Connect(InetSocketAddress(interfaces2.GetAddress(1), 9));
 
     std::ostringstream oss2;
-    oss2 << p_info.trailing_s+30 << "-" << p_info.cross_traffic_s << "-" << p_info.link_cap << "-one-intermediate";
+    oss2 << p_info.trailing_s+30 << "-" << p_info.cross_traffic_s << "-" << p_info.link_cap << "-" << simulation_round << "-one-intermediate";
     std::string pcap_file = oss2.str();
     pointToPoint.EnablePcap(pcap_file, devices2.Get(0));
 
@@ -158,7 +159,7 @@ int main(int argc, char* argv[]) {
     //How often a probing pair should be sent
     int probingRate = p_info.link_cap == 100 ? 100 : 10;
 
-    Simulator::Schedule(MilliSeconds(2002), &SendProbingPacket, &p_info, source, 0, probingRate);
+    Simulator::Schedule(MilliSeconds(2002), &SendProbingPacket, &p_info, source, ttl, probingRate);
     Simulator::Schedule(MilliSeconds(2100), &traceQueueLength, queue, 400, &file, queueMeasurementRate);
     Simulator::Run();
     Simulator::Destroy();
