@@ -97,7 +97,8 @@ main categories:
     - The clusters are reassigned with the filtered data.  
     - Queueing delay and standard deviation is calculated 
     - The results are written to the results.csv file, on the row corresponding
-to the simulation round. 7.steps 3 to 6 are repeated four more times.
+to the simulation round.   
+7. 3 to 6 are repeated four more times.
 
 ## Clarifications and possible confusion
 1. If you see that the packet sizes are 30 bytes less than you expect in the
