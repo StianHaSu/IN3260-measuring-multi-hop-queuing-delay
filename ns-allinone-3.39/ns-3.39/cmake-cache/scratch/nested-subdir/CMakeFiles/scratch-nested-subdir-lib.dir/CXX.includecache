@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/teacup/IN3260-measuring-multi-hop-queuing-delay/ns-allinone-3.39/ns-3.39/scratch/nested-subdir/lib/scratch-nested-subdir-library-header.h
+string
+-
+
+/home/teacup/IN3260-measuring-multi-hop-queuing-delay/ns-allinone-3.39/ns-3.39/scratch/nested-subdir/lib/scratch-nested-subdir-library-source.cc
+scratch-nested-subdir-library-header.h
+/home/teacup/IN3260-measuring-multi-hop-queuing-delay/ns-allinone-3.39/ns-3.39/scratch/nested-subdir/lib/scratch-nested-subdir-library-header.h
+

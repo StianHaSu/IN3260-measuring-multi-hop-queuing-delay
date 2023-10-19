@@ -9,7 +9,6 @@
 #include "../src/mobility/model/constant-position-mobility-model.h"
 #include "../common.cpp"
 #include <string>
-#include <format>
 
 using namespace ns3;
 int main(int argc, char* argv[]) {
