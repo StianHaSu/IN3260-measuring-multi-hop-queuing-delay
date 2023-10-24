@@ -20,7 +20,7 @@ std::mt19937 gen(rd());
 std::uniform_int_distribution<> dis(1, 5);
 
 
-int packet_trains = 100;
+int packet_trains = 500;
 
 uint32_t* calculateTimeIntervals(packet_info *p_info) {
     uint32_t rates[4];
