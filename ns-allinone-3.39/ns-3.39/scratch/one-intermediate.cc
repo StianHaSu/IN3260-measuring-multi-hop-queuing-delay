@@ -144,7 +144,7 @@ int main(int argc, char* argv[]) {
     std::ostringstream oss2;
     oss2 << p_info.trailing_s+30 << "-" << p_info.cross_traffic_s << "-" << p_info.link_cap << "-" << simulation_round << "-one-intermediate";
     std::string pcap_file = oss2.str();
-    pointToPoint.EnablePcap(pcap_file, devices2.Get(0));
+    pointToPoint.EnablePcap(pcap_file, devices2.Get(1));
 
     AnimationInterface anim("animation.xml");
 
@@ -159,10 +159,11 @@ int main(int argc, char* argv[]) {
     //How often a probing pair should be sent
     int probingRate = p_info.link_cap == 100 ? 50 : 10;
 
-    Simulator::Schedule(MilliSeconds(2002), &SendProbingPacket, &p_info, source, 0, probingRate);
+    Simulator::Schedule(MilliSeconds(2005), &SendProbingPacket, &p_info, source, 0, probingRate);
     Simulator::Schedule(MilliSeconds(2100), &traceQueueLength, queue, 400, &file, queueMeasurementRate);
     Simulator::Run();
     Simulator::Destroy();
+
     file.close();
     free(time_interval);
     return 0;

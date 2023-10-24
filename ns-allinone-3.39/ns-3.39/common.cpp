@@ -17,10 +17,10 @@ using namespace ns3;
 
 std::random_device rd;
 std::mt19937 gen(rd());
-std::uniform_int_distribution<> dis(1, 5);
+std::uniform_int_distribution<> dis(0, 5);
 
 
-int packet_trains = 100;
+int packet_trains = 50;
 
 uint32_t* calculateTimeIntervals(packet_info *p_info) {
     uint32_t rates[4];
@@ -71,7 +71,7 @@ void SendProbingPacket(packet_info *p_info, Ptr<Socket> socket, int ttl, int rat
     SendPacket(socket, p_info->trailing_s);
     packet_trains--;
 
-    Simulator::Schedule(MilliSeconds(dis(gen)*rate), &SendProbingPacket, p_info, socket, ttl, rate);
+    Simulator::Schedule(MilliSeconds(rate + 10*dis(gen)), &SendProbingPacket, p_info, socket, ttl, rate);
 }
 
 //Sends packet with a given time interval and packet size

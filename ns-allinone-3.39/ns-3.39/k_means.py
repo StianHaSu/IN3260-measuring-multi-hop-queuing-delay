@@ -23,13 +23,6 @@ def calculate_vaiability(cluster_co, cluster_dc, queueing_delay):
 
     return combined_variability
 
-def simple_var(cluster_co, cluster_dc, queueing_delay):
-    variability = (cluster_co.centroid*10**6 - queueing_delay)**2
-    variability += (cluster_dc.centroid*10**6 - queueing_delay)**2
-    
-    combined = math.sqrt(variability/(len(cluster_co.cluster)+len(cluster_dc.cluster)-1))
-    return combined
-
 #Filters out intra-probe gaps that has a frequency 
 #of less than 20% in a given cluster
 def filter_group(group):
@@ -48,13 +41,12 @@ def create_groups(file):
     data = pd.read_csv(file)
     
     #Packet size * 8 / (link cap * 10**6)
-    data['Gap'] = data['Gap'] - ((float(packet_info[0])*8)/(float(packet_info[2])*10**6))
-
+    data['Gap'] = data['Gap'] - (float(packet_info[0])*8)/(float(packet_info[2])*10**6)
     kmeans = KMeans(n_clusters=3, init='k-means++', random_state=0)
     clusters = kmeans.fit_predict(data)
-
+    
     data['Cluster'] = clusters
-
+    
     return data.groupby('Cluster')
 
 grouped_clusters = create_groups(sys.argv[1])
@@ -73,7 +65,7 @@ three = filter_group(three)
 result = pd.concat([one, two, three], ignore_index=True)
 result = result.drop('Cluster', axis=1)
 
-print("result size: ",len(result))
+print("result size: ", len(result))
 
 #Fit the new data after filtering
 kmeans2 = KMeans(n_clusters=3, init='k-means++', random_state=0)
@@ -135,6 +127,7 @@ total += delay_co*s_co
 total += delay_de*s_de
 
 total *= 10**6
+
 #Print out the resulting queuing delay in microseconds
 print(f"Queueing delay: {total} micro seconds")
 

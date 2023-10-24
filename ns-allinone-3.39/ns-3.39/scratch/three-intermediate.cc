@@ -34,13 +34,16 @@ int main(int argc, char* argv[]) {
     oss << p_info.trailing_s+30 << "-" << p_info.cross_traffic_s << "-" << p_info.link_cap << "-" << simulation_round;
     std::string base_queue_file = oss.str();
 
-    std::string queue1 = base_queue_file.append("-queue-size.csv-1.csv");
-    std::string queue2 = base_queue_file.append("-queue-size.csv-2.csv");
-    std::string queue3 = base_queue_file.append("-queue-size.csv-3.csv");
+    std::string queue_file1 = base_queue_file;
+    queue_file1.append("-queue-size-1.csv");
+    std::string queue_file2 = base_queue_file;
+    queue_file2.append("-queue-size-2.csv");
+    std::string queue_file3 = base_queue_file;
+    queue_file3.append("-queue-size-3.csv");
 
-    std::ofstream file1(queue1);
-    std::ofstream file2(queue2);
-    std::ofstream file3(queue3);
+    std::ofstream file1(queue_file1);
+    std::ofstream file2(queue_file2);
+    std::ofstream file3(queue_file3);
 
     uint32_t *time_interval = calculateTimeIntervals(&p_info);
     printf("Heading: %u Trailing: %u Cross: %u Link: %u \n",p_info.heading_s, p_info.trailing_s, p_info.cross_traffic_s, p_info.link_cap);
@@ -80,7 +83,7 @@ int main(int argc, char* argv[]) {
 
     PointToPointHelper pointToPoint;
     pointToPoint.SetDeviceAttribute("DataRate", StringValue(std::strcat(argv[4], "Mbps")));
-    pointToPoint.SetChannelAttribute("Delay", StringValue("2ms"));
+    pointToPoint.SetChannelAttribute("Delay", StringValue("5ms"));
 
     //End-to-end path
     NodeContainer ab = NodeContainer(nodes.Get(0), nodes.Get(1));
@@ -219,59 +222,59 @@ int main(int argc, char* argv[]) {
 
     //Cross traffic node 1
     Ptr<Socket> crossTraffic1 = Socket::CreateSocket(nodes.Get(5), UdpSocketFactory::GetTypeId());
-    crossTraffic1->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
-    crossTraffic1->Connect(InetSocketAddress(interfaces9.GetAddress(0), 8));
+    crossTraffic1->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
+    crossTraffic1->Connect(InetSocketAddress(interfaces9.GetAddress(0), 9));
 
     Ptr<Socket> crossTraffic2 = Socket::CreateSocket(nodes.Get(6), UdpSocketFactory::GetTypeId());
-    crossTraffic2->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
-    crossTraffic2->Connect(InetSocketAddress(interfaces10.GetAddress(0), 8));
+    crossTraffic2->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
+    crossTraffic2->Connect(InetSocketAddress(interfaces10.GetAddress(0), 9));
 
     Ptr<Socket> crossTraffic3 = Socket::CreateSocket(nodes.Get(7), UdpSocketFactory::GetTypeId());
-    crossTraffic3->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
-    crossTraffic3->Connect(InetSocketAddress(interfaces11.GetAddress(0), 8));
+    crossTraffic3->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
+    crossTraffic3->Connect(InetSocketAddress(interfaces11.GetAddress(0), 9));
 
     Ptr<Socket> crossTraffic4 = Socket::CreateSocket(nodes.Get(8), UdpSocketFactory::GetTypeId());
-    crossTraffic4->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
-    crossTraffic4->Connect(InetSocketAddress(interfaces12.GetAddress(0), 8));
+    crossTraffic4->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
+    crossTraffic4->Connect(InetSocketAddress(interfaces12.GetAddress(0), 9));
 
     //Cross traffic node 2
     Ptr<Socket> crossTraffic5 = Socket::CreateSocket(nodes.Get(9), UdpSocketFactory::GetTypeId());
-    crossTraffic5->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
-    crossTraffic5->Connect(InetSocketAddress(interfaces13.GetAddress(0), 8));
+    crossTraffic5->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
+    crossTraffic5->Connect(InetSocketAddress(interfaces13.GetAddress(0), 9));
 
     Ptr<Socket> crossTraffic6 = Socket::CreateSocket(nodes.Get(10), UdpSocketFactory::GetTypeId());
-    crossTraffic6->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
-    crossTraffic6->Connect(InetSocketAddress(interfaces14.GetAddress(0), 8));
+    crossTraffic6->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
+    crossTraffic6->Connect(InetSocketAddress(interfaces14.GetAddress(0), 9));
 
     Ptr<Socket> crossTraffic7 = Socket::CreateSocket(nodes.Get(11), UdpSocketFactory::GetTypeId());
-    crossTraffic7->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
-    crossTraffic7->Connect(InetSocketAddress(interfaces15.GetAddress(0), 8));
+    crossTraffic7->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
+    crossTraffic7->Connect(InetSocketAddress(interfaces15.GetAddress(0), 9));
 
     Ptr<Socket> crossTraffic8 = Socket::CreateSocket(nodes.Get(12), UdpSocketFactory::GetTypeId());
-    crossTraffic8->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
-    crossTraffic8->Connect(InetSocketAddress(interfaces16.GetAddress(0), 8));
+    crossTraffic8->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
+    crossTraffic8->Connect(InetSocketAddress(interfaces16.GetAddress(0), 9));
 
     //Cross traffic node 3
     Ptr<Socket> crossTraffic9 = Socket::CreateSocket(nodes.Get(13), UdpSocketFactory::GetTypeId());
-    crossTraffic9->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
-    crossTraffic9->Connect(InetSocketAddress(interfaces4.GetAddress(1), 8));
+    crossTraffic9->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
+    crossTraffic9->Connect(InetSocketAddress(interfaces4.GetAddress(1), 9));
 
     Ptr<Socket> crossTraffic10 = Socket::CreateSocket(nodes.Get(14), UdpSocketFactory::GetTypeId());
-    crossTraffic10->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
-    crossTraffic10->Connect(InetSocketAddress(interfaces4.GetAddress(1), 8));
+    crossTraffic10->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
+    crossTraffic10->Connect(InetSocketAddress(interfaces4.GetAddress(1), 9));
 
     Ptr<Socket> crossTraffic11 = Socket::CreateSocket(nodes.Get(15), UdpSocketFactory::GetTypeId());
-    crossTraffic11->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
-    crossTraffic11->Connect(InetSocketAddress(interfaces4.GetAddress(1), 8));
+    crossTraffic11->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
+    crossTraffic11->Connect(InetSocketAddress(interfaces4.GetAddress(1), 9));
 
     Ptr<Socket> crossTraffic12 = Socket::CreateSocket(nodes.Get(16), UdpSocketFactory::GetTypeId());
-    crossTraffic12->Bind(InetSocketAddress(Ipv4Address::GetAny(), 8));
-    crossTraffic12->Connect(InetSocketAddress(interfaces4.GetAddress(1), 8));
+    crossTraffic12->Bind(InetSocketAddress(Ipv4Address::GetAny(), 9));
+    crossTraffic12->Connect(InetSocketAddress(interfaces4.GetAddress(1), 9));
 
     std::ostringstream oss2;
     oss2 << p_info.trailing_s+30 << "-" << p_info.cross_traffic_s << "-" << p_info.link_cap << "-" << simulation_round << "-three-intermediate";
     std::string pcap_file = oss2.str();
-    pointToPoint.EnablePcap(pcap_file, devices4.Get(0));
+    pointToPoint.EnablePcap(pcap_file, devices4.Get(1));
 
     AnimationInterface anim("animation2.xml");
 
@@ -296,15 +299,18 @@ int main(int argc, char* argv[]) {
     //How often a probing pair should be sent (in milliseconds)
     int probingRate = p_info.link_cap == 100 ? 100 : 10;
 
-    Simulator::Schedule(MilliSeconds(2004), &SendProbingPacket, &p_info, source, 3, probingRate);
-    Simulator::Schedule(MilliSeconds(2004), &traceQueueLength, queue, 400, &file1, queueMeasurementRate);
-    Simulator::Schedule(MilliSeconds(2004), &traceQueueLength, queue2, 400, &file2, queueMeasurementRate);
-    Simulator::Schedule(MilliSeconds(2004), &traceQueueLength, queue3, 400, &file3, queueMeasurementRate);
+    Simulator::Schedule(MilliSeconds(2004), &SendProbingPacket, &p_info, source, ttl, probingRate);
+    Simulator::Schedule(MilliSeconds(2010), &traceQueueLength, queue, 400, &file1, queueMeasurementRate);
+    Simulator::Schedule(MilliSeconds(2010), &traceQueueLength, queue2, 400, &file2, queueMeasurementRate);
+    Simulator::Schedule(MilliSeconds(2010), &traceQueueLength, queue3, 400, &file3, queueMeasurementRate);
+
     Simulator::Run();
     Simulator::Destroy();
+
     file1.close();
     file2.close();
     file3.close();
     free(time_interval);
+
     return 0;
 }
