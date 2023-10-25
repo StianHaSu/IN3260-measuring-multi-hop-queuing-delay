@@ -297,7 +297,8 @@ int main(int argc, char* argv[]) {
     int queueMeasurementRate = p_info.link_cap == 100 ? 5000 : 500;
 
     //How often a probing pair should be sent (in milliseconds)
-    int probingRate = p_info.link_cap == 100 ? 100 : 10;
+    int probingRate = p_info.link_cap == 100 ? 500 : 10;
+    printf("Probing rate: %d\n", probingRate);
 
     Simulator::Schedule(MilliSeconds(2004), &SendProbingPacket, &p_info, source, ttl, probingRate);
     Simulator::Schedule(MilliSeconds(2010), &traceQueueLength, queue, 400, &file1, queueMeasurementRate);

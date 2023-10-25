@@ -13,11 +13,11 @@ row_to_update = int(sys.argv[3])
 def calculate_vaiability(cluster_co, cluster_dc, queueing_delay, no_change):    
     variability_co = 0
     for _, element in cluster_co.cluster.iterrows():
-        variability_co += ((float(element['Gap']))-queueing_delay-no_change.centroid)**2
+        variability_co += ((float(element['Gap']))-no_change.centroid)**2
 
     variability_dc = 0
     for _, element in cluster_dc.cluster.iterrows():
-        variability_dc += ((float(element['Gap']))-queueing_delay-no_change.centroid)**2
+        variability_dc += ((float(element['Gap']))-no_change.centroid)**2
         
     
     print("Cluster size co: ", len(cluster_co.cluster))
@@ -26,7 +26,7 @@ def calculate_vaiability(cluster_co, cluster_dc, queueing_delay, no_change):
     print("var co: ", variability_co)
     print("var de: ", variability_dc)
     
-    combined_variability = (variability_co + variability_dc)/(len(cluster_dc.cluster) + len(cluster_co.cluster)-1)
+    combined_variability = (variability_co + variability_dc)/(len(cluster_dc.cluster) + len(cluster_co.cluster) + len(no_change.cluster) -1)
     print("var: ", combined_variability)
     combined_variability = math.sqrt(combined_variability)
     print("var: ", combined_variability)
@@ -112,6 +112,7 @@ co = cluster_map[cluster_list[0]]
 nc = cluster_map[cluster_list[1]]
 de = cluster_map[cluster_list[2]]
 
+
 print("co: ", len(co.cluster))
 print("nc: ", len(nc.cluster))
 print("de: ", len(de.cluster))
@@ -141,6 +142,8 @@ s_de = len(de.cluster) / (len(co.cluster) + len(de.cluster))
 total += delay_co*s_co
 total += delay_de*s_de
 
+mean = np.mean(result['Gap'])
+print("mean: ", mean)
 #total *= 10**6
 
 #Print out the resulting queuing delay in microseconds

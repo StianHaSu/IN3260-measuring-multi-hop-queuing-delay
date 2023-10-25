@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 #Updates the value of a given row an column
 def update_value(file, row, column, value):
@@ -29,10 +30,15 @@ def display_graph(filename, row):
     error_bars = [df.at[row, "R_v"], df.at[row, "M_v"]] 
 
     x_ticks = range(len(x_values))
-    bars = plt.bar(x_ticks, y_values, width=0.1, alpha=0.7, align="center", fill=False, hatch='||--')
-    bars[0].set_color("grey")
-    bars[1].set_color("red")
+    real_bar = plt.bar(0, df.at[row, "R_d"], width=0.1, alpha=0.7, align="center", fill=False, hatch='||--')
+    measured_bar = plt.bar(1, df.at[row, "M_d"], width=0.1, alpha=0.7, align="center", fill=False, hatch='////')
+    
+    real_bar[0].set_color("grey")
+    measured_bar[0].set_color("red")
+    
+    plt.legend([real_bar, measured_bar], ["Real", "CoDe"], loc="upper center")
     plt.xticks(x_ticks, x_values)
+    plt.yticks(np.arange(0, 50, step=1))
     plt.errorbar(x_ticks, y_values, yerr=error_bars, fmt="o", color="black", capsize=3)
     plt.show()
 

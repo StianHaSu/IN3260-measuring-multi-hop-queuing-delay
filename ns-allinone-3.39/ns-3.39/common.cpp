@@ -18,9 +18,8 @@ using namespace ns3;
 std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_int_distribution<> dis(0, 5);
-
-
-int packet_trains = 50;
+ 
+int packet_trains = 500;
 
 uint32_t* calculateTimeIntervals(packet_info *p_info) {
     uint32_t rates[4];
