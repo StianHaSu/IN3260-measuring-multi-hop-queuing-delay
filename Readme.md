@@ -38,6 +38,15 @@ that automatically runs the filtering, gap measuring, and kmeans programs automt
 - [x] Create graph data for all 100Mbps combinations.
 - [ ] Create graph data for all 1Gbps combinations. (This will not be done by wednesday, as the simulations are taking to long.)
 
+### Week 43 
+- Working on getting the multihop pipline in place.
+- Was previously tracing wrong interface, now fixed.
+- Having more doubt about the standars deviation:
+  - We are using the queuing delay as the mean, and using gaps from the compression and decompression clusters.
+    But the queuing delay is not the mean of the data-set. We are comparing only a part of the measured gaps (the queuing delay)
+    and comparing it to "full" gaps to measure standard deviation.
+    Does it maybe make more sense to use the no-change centroid as the mean, or maybe the actual mean of the gaps? 
+
 ## References
 
 [1] Ricker, Travis, et al. "A Machine Learning Approach to Estimating Queuing Delay on a Router over a Single-Hop Path." ICC 2022-IEEE International Conference on Communications. IEEE, 2022. <br />
