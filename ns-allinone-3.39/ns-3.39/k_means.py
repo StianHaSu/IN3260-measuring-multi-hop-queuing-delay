@@ -51,7 +51,7 @@ def create_groups(file):
     data = pd.read_csv(file)
     
     #Packet size * 8 / (link cap * 10**6)
-    data['Gap'] = (abs(data['Gap'] - ((float(packet_info[0])*8)/(float(packet_info[2])*10**6))))*10**6
+    data['Gap'] = (data['Gap'] - ((float(packet_info[0])*8)/(float(packet_info[2])*10**6)))*10**6
     kmeans = KMeans(n_clusters=3, init='k-means++', random_state=0)
     clusters = kmeans.fit_predict(data)
 
@@ -137,13 +137,11 @@ total = 0
 s_co = len(co.cluster) / (len(co.cluster) + len(de.cluster))
 s_de = len(de.cluster) / (len(co.cluster) + len(de.cluster))
 
+print(f"Weighted delay compression: {delay_co*s_co}")
+print(f"Weighted delay decompression: {delay_de*s_de}")
+
 total += delay_co*s_co
 total += delay_de*s_de
-
-mean = np.mean(result['Gap'])
-print("mean: ", mean)
-
-#total *= 10**6
 
 #Print out the resulting queuing delay in microseconds
 print(f"Queueing delay: {total} micro seconds")
