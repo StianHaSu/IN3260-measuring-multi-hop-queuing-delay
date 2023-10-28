@@ -30,6 +30,8 @@ int main(int argc, char* argv[]) {
     int simulation_round = std::atoi(argv[5]);
     int ttl = std::atoi(argv[6]);
 
+    printf("TTL: %d \n", ttl);
+
     std::ostringstream oss;
     oss << p_info.trailing_s+30 << "-" << p_info.cross_traffic_s << "-" << p_info.link_cap << "-" << simulation_round;
     std::string base_queue_file = oss.str();
@@ -274,6 +276,7 @@ int main(int argc, char* argv[]) {
     std::ostringstream oss2;
     oss2 << p_info.trailing_s+30 << "-" << p_info.cross_traffic_s << "-" << p_info.link_cap << "-" << simulation_round << "-three-intermediate";
     std::string pcap_file = oss2.str();
+
     pointToPoint.EnablePcap(pcap_file, devices4.Get(1));
 
     AnimationInterface anim("animation2.xml");
@@ -297,7 +300,7 @@ int main(int argc, char* argv[]) {
     int queueMeasurementRate = p_info.link_cap == 100 ? 5000 : 500;
 
     //How often a probing pair should be sent (in milliseconds)
-    int probingRate = p_info.link_cap == 100 ? 100 : 10;
+    int probingRate = p_info.link_cap == 100 ? 50 : 10;
 
     Simulator::Schedule(MilliSeconds(2004), &SendProbingPacket, &p_info, source, ttl, probingRate);
     Simulator::Schedule(MilliSeconds(2010), &traceQueueLength, queue, 400, &file1, queueMeasurementRate);

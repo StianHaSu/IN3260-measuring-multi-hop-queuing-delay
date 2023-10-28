@@ -13,12 +13,11 @@ row_to_update = int(sys.argv[3])
 def calculate_vaiability(cluster_co, cluster_dc, queueing_delay, no_change):    
     variability_co = 0
     for _, element in cluster_co.cluster.iterrows():
-        variability_co += ((float(element['Gap']))-queueing_delay-no_change.centroid)**2
+        variability_co += ((float(element['Gap']))-no_change.centroid)**2
 
     variability_dc = 0
     for _, element in cluster_dc.cluster.iterrows():
-        variability_dc += ((float(element['Gap']))-queueing_delay-no_change.centroid)**2
-        
+        variability_dc += ((float(element['Gap']))-no_change.centroid)**2
     
     print("Cluster size co: ", len(cluster_co.cluster))
     print("Cluster size dc: ", len(cluster_dc.cluster))
@@ -26,7 +25,7 @@ def calculate_vaiability(cluster_co, cluster_dc, queueing_delay, no_change):
     print("var co: ", variability_co)
     print("var de: ", variability_dc)
     
-    combined_variability = (variability_co + variability_dc)/(len(cluster_dc.cluster) + len(cluster_co.cluster)-1)
+    combined_variability = (variability_co + variability_dc)/(len(cluster_dc.cluster) + len(cluster_co.cluster) + len(no_change.cluster) -1)
     print("var: ", combined_variability)
     combined_variability = math.sqrt(combined_variability)
     print("var: ", combined_variability)
@@ -52,7 +51,7 @@ def create_groups(file):
     data = pd.read_csv(file)
     
     #Packet size * 8 / (link cap * 10**6)
-    data['Gap'] = (abs(data['Gap'] - ((float(packet_info[0])*8)/(float(packet_info[2])*10**6))))*10**6
+    data['Gap'] = (data['Gap'] - ((float(packet_info[0])*8)/(float(packet_info[2])*10**6)))*10**6
     kmeans = KMeans(n_clusters=3, init='k-means++', random_state=0)
     clusters = kmeans.fit_predict(data)
 
@@ -138,10 +137,11 @@ total = 0
 s_co = len(co.cluster) / (len(co.cluster) + len(de.cluster))
 s_de = len(de.cluster) / (len(co.cluster) + len(de.cluster))
 
+print(f"Weighted delay compression: {delay_co*s_co}")
+print(f"Weighted delay decompression: {delay_de*s_de}")
+
 total += delay_co*s_co
 total += delay_de*s_de
-
-#total *= 10**6
 
 #Print out the resulting queuing delay in microseconds
 print(f"Queueing delay: {total} micro seconds")

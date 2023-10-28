@@ -1,10 +1,9 @@
 import sys
 import pandas as pd
 import numpy as np
-from graph_utils import display_graph
+import graph_utils 
 
 file_in = sys.argv[1]
-file_out = file_in+"-combined"
 
 df = pd.read_csv(file_in)
 
@@ -14,8 +13,10 @@ measured_variability = np.average(df['M_v'].tolist())
 actual_delay = np.average(df['R_d'].tolist())
 actual_variability = np.average(df['R_v'].tolist())
 
-file = open(file_out, "w+")
-file.write("M_d,M_v,R_d,R_v\n")
-file.write(f"{measured_delay},{measured_variability},{actual_delay},{actual_variability}")
-file.close()
-display_graph(file_out, 0)
+graph_utils.create_new_row(file_in, df.at[0, "p_h"], df.at[0, "p_t"], df.at[0, "p_c"], df.at[0, "L_cap"])
+graph_utils.update_value(file_in, 5, "M_d", measured_delay)
+graph_utils.update_value(file_in, 5, "M_v", measured_variability)
+graph_utils.update_value(file_in, 5, "R_d", actual_delay)
+graph_utils.update_value(file_in, 5, "R_v", actual_variability)
+
+graph_utils.display_graph(file_in, 5)
