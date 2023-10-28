@@ -4,7 +4,7 @@ TRAFFIC_PACKET = 100
 LINK_CAP = 100
 
 #Used for the the three intermediate nodes simulation
-NODE_TO_MEASURE = 1
+NODE_TO_MEASURE = 3
 
 build:
 	./ns3 configure -d debug --enable-examples --enable-tests
