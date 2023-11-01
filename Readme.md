@@ -46,6 +46,22 @@ that automatically runs the filtering, gap measuring, and kmeans programs automt
     But the queuing delay is not the mean of the data-set. We are comparing only a part of the measured gaps (the queuing delay)
     and comparing it to "full" gaps to measure standard deviation.
     Does it maybe make more sense to use the no-change centroid as the mean, or maybe the actual mean of the gaps?
+- Making graphs for single hop case
+
+
+### Week 44
+- Started on multi-hop simulations.
+- Started on the presentation for the course examination.
+- Started making graphs for multi-hop case
+  - [x] 800-100-100
+  - [x] 800-200-100
+  - [ ] 800-300-100
+  - [ ] 1000-100-100
+  - [ ] 1000-200-100
+  - [ ] 1000-300-100
+  - [ ] 1400-100-100
+  - [ ] 1400-200-100
+  - [ ] 1400-300-100
 
 # User guide for queueing delay measurement
 
