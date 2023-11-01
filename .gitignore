@@ -53,3 +53,8 @@ ns-allinone-3.39/ns-3.39/1
 ns-allinone-3.39/ns-3.39/1400-*
 ns-allinone-3.39/ns-3.39/three-*
 ns-allinone-3.39/.DS_Store
+cmake-build-debug/
+
+unstable-three-800-100-100-1/
+unstable-three-800-100-100-2/
+.idea/
