@@ -41,6 +41,7 @@ main categories:
       and standard deviation in ***k_means.py***
 
 
+
 ## How to run   
 1. Navigate to the ns-3.39 directory.  
 2. Run "make build" which builds the project and enable debugging and testing.  
@@ -60,7 +61,7 @@ main categories:
       packet pairs.   
     This is mainly used for testing purposes.
 
-## The pipeline one intermediate node
+## The pipeline
 ![Pipeline](pipeline.png)
 
 1. Set packet sizes and link capasity in the top of the Makefile  
@@ -70,7 +71,7 @@ main categories:
       convention mentioned in ***File names and namin convetions***  
     - Updates the row in the file created, on the row corresponding to the
       simulation run with packet informatiom and link capasity.  
-3. one-intermediate.cc runs  
+3. [one/three]-intermediate.cc runs  
     - 500 probing pairs are sent with with a distance of 50 - 250 ms between
       each pair.  
     - Queue sizes are measured every 5 micro seconds, 400 times and the queue
@@ -99,6 +100,9 @@ main categories:
     - The results are written to the results.csv file, on the row corresponding
 to the simulation round.   
 7. 3 to 6 are repeated four more times.
+8. Dircetory with name ***[trailing packet size]-[cross traffic packet size]-[link capasity (in
+      Mbps)]***6 is created. If the simulation is a three intermediate simulation, the folder is prefixed by "three-"
+9. All files created during the simulation run is moved into the directory created in step 8. 
 
 ## Clarifications and possible confusion
 1. If you see that the packet sizes are 30 bytes less than you expect in the

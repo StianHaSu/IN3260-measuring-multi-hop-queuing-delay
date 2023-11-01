@@ -1,6 +1,6 @@
 LEADING_PACKET = 64
 TRAILING_PACKET = 800
-TRAFFIC_PACKET = 100
+TRAFFIC_PACKET = 200
 LINK_CAP = 100
 
 #Used for the the three intermediate nodes simulation
@@ -64,7 +64,7 @@ completeSimulation1:
 completeSimulation3:
 	python3 prepare_simulation.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results-three.csv 0 $(LEADING_PACKET) $(TRAILING_PACKET) $(TRAFFIC_PACKET) $(LINK_CAP)
 	./ns3 run scratch/three-intermediate -- $(LEADING_PACKET) $(TRAILING_PACKET) $(TRAFFIC_PACKET) $(LINK_CAP) 0 $(NODE_TO_MEASURE)
-	python3 real_delay.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-queue-size-$(NODE_TO_MEASURE).csv $(TRAFFIC_PACKET) $(LINK_CAP) $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results-three.csv 0
+
 	python3 filter_packets.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probes-three.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-three-intermediate-4-1.pcap $(TRAILING_PACKET)
 	python3 gap_measurement.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probes-three.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probe-gaps-three.csv
 	python3 k_means.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probe-gaps-three.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results-three.csv 0
