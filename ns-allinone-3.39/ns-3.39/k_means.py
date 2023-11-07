@@ -11,7 +11,7 @@ output_file = sys.argv[2]
 row_to_update = int(sys.argv[3])
 
 
-def calculate_vaiability(cluster_co, cluster_dc, queueing_delay, no_change):
+def calculate_variability(cluster_co, cluster_dc, queueing_delay, no_change):
     variability_co = 0
     for _, element in cluster_co.cluster.iterrows():
         variability_co += ((float(element['Gap'])) - no_change.centroid) ** 2
@@ -38,6 +38,9 @@ def calculate_vaiability(cluster_co, cluster_dc, queueing_delay, no_change):
 # Filters out intra-probe gaps that has a frequency
 # of less than 20% in a given cluster
 def filter_group(group):
+    if group is None:
+        return
+
     group_size = len(group)
     counts = group['Gap'].value_counts()
 
@@ -53,8 +56,15 @@ def create_groups(file):
     packet_info = file.split("-")
     data = pd.read_csv(file)
 
+    print(f"packet size {packet_info[0]}, link cap {packet_info[2]}")
     # Packet size * 8 / (link cap * 10**6)
     data['Gap'] = (data['Gap'] - ((float(packet_info[0]) * 8) / (float(packet_info[2]) * 10 ** 6))) * 10 ** 6
+
+    print(f"len before: {len(data['Gap'])}")
+    counts = data['Gap'].value_counts()
+
+    print(f"len after: {len(data['Gap'])}")
+    print(data['Gap'])
     kmeans = KMeans(n_clusters=3, init='k-means++', random_state=0)
     clusters = kmeans.fit_predict(data)
 
@@ -70,12 +80,23 @@ one = grouped_clusters.get_group(0)
 two = grouped_clusters.get_group(1)
 three = grouped_clusters.get_group(2)
 
+"""
+if len(one) < 35:
+    one = None
+
+if len(two) < 35:
+    two = None
+
+if len(three) < 35:
+    three = None
+"""
+
 # Filter out members of each cluster with a frequency of < 20%
 one = filter_group(one)
 two = filter_group(two)
 three = filter_group(three)
 
-# Concatinate the groups to do another k-means clustering
+# Concatenate the groups to do another k-means clustering
 result = pd.concat([one, two, three], ignore_index=True)
 result = result.drop('Cluster', axis=1)
 
@@ -85,6 +106,8 @@ print("result size: ", len(result))
 kmeans2 = KMeans(n_clusters=3, init='k-means++', random_state=0)
 clusters2 = kmeans2.fit_predict(result)
 result['Cluster'] = clusters2
+
+result.to_csv("clusters.csv", encoding='utf-8')
 
 grouped_clusters2 = result.groupby('Cluster')
 
@@ -150,7 +173,7 @@ total += delay_de * s_de
 # Print out the resulting queuing delay in microseconds
 print(f"Queueing delay: {total} micro seconds")
 
-variability = calculate_vaiability(co, de, total, nc)
+variability = calculate_variability(co, de, total, nc)
 
 print("\n")
 

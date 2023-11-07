@@ -18,8 +18,8 @@ using namespace ns3;
 std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_int_distribution<> dis(0, 5);
- 
-int packet_trains = 500;
+
+int packet_trains = 400;
 
 uint32_t* calculateTimeIntervals(packet_info *p_info) {
     uint32_t rates[4];
@@ -55,7 +55,6 @@ void SendPacket(Ptr<Socket> socket, int packet_size) {
 //Sends a packet with a given ttl, used for the redundant packet
 void SendPacketWithTTL(Ptr<Socket> socket, int packet_size, int ttl) {
     socket->SetIpTtl(ttl);
-
     Ptr<Packet> packet = Create<Packet>(packet_size);
     socket->Send(packet);
 }
@@ -65,7 +64,9 @@ void SendProbingPacket(packet_info *p_info, Ptr<Socket> socket, int ttl, int rat
     if (packet_trains % 50 == 0) { std::cout<<packet_trains<<std::endl; }
 
     if (packet_trains < 1) return;
-    if (ttl > 0) { SendPacketWithTTL(socket, 3500, ttl); }
+    if (ttl > 0) {
+        SendPacketWithTTL(socket, 3500, ttl);
+    }
     SendPacket(socket, p_info->heading_s);
     SendPacket(socket, p_info->trailing_s);
     packet_trains--;
@@ -83,6 +84,7 @@ void GenerateCrossTraffic(packet_info *p_info, Ptr<Socket> socket, int rate) {
 
 //Measures the queue length of a given queue, every rate microseconds
 void traceQueueLength(Ptr<Queue<Packet>> queue, int measurement, std::ofstream *file, int rate) {
+    packet_trains--;
     if (measurement < 1) return;
     *file << queue->GetCurrentSize().GetValue() << ",";
     *file << 400-measurement << "\n";

@@ -278,6 +278,10 @@ int main(int argc, char* argv[]) {
     std::string pcap_file = oss2.str();
 
     pointToPoint.EnablePcap(pcap_file, devices4.Get(1));
+    pointToPoint.EnablePcap("test-1", devices2.Get(0));
+    pointToPoint.EnablePcap("test-1", devices3.Get(0));
+    pointToPoint.EnablePcap("test-1", devices4.Get(0));
+
 
     AnimationInterface anim("animation2.xml");
 
@@ -303,9 +307,9 @@ int main(int argc, char* argv[]) {
     int probingRate = p_info.link_cap == 100 ? 100 : 10;
 
     Simulator::Schedule(MilliSeconds(2004), &SendProbingPacket, &p_info, source, ttl, probingRate);
-    Simulator::Schedule(MilliSeconds(2010), &traceQueueLength, queue, 400, &file1, queueMeasurementRate);
-    Simulator::Schedule(MilliSeconds(2010), &traceQueueLength, queue2, 400, &file2, queueMeasurementRate);
-    Simulator::Schedule(MilliSeconds(2010), &traceQueueLength, queue3, 400, &file3, queueMeasurementRate);
+    Simulator::Schedule(MilliSeconds(2010), &traceQueueLength, queue, 10000, &file1, queueMeasurementRate);
+    Simulator::Schedule(MilliSeconds(2010), &traceQueueLength, queue2, 10000, &file2, queueMeasurementRate);
+    Simulator::Schedule(MilliSeconds(2010), &traceQueueLength, queue3, 10000, &file3, queueMeasurementRate);
 
     Simulator::Run();
     Simulator::Destroy();
