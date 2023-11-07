@@ -32,7 +32,6 @@ temp-*
 .lock-waf*
 
 .DS_Store
-*.cmake
 ns-allinone-3.39/ns-3.39/cmake-cache/
 ns-allinone-3.39/ns-3.39/800-100-100/*
 ns-allinone-3.39/ns-3.39/800-200-100/*
