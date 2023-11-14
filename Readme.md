@@ -63,6 +63,15 @@ that automatically runs the filtering, gap measuring, and kmeans programs automt
   - [ ] 1400-200-100
   - [ ] 1400-300-100
 
+### Week 45  
+Fixed all single hop graphs, added COMPRESS to all the signle hop graphs.  
+
+### Week 46 
+- [x] Add KDE to all single hop graphs
+- [ ] Test kmeans on multi hop, discarding decompression
+- [ ] Test KDE on multi hop with decompression
+- [ ] Test KDE on multi hop, discarding decompression (if with fails)
+
 # User guide for queueing delay measurement
 
 ## File names and naming convetions
