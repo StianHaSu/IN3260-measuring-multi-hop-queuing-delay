@@ -16,7 +16,7 @@ def update_value(file, row, column, value):
 # as the link capasity.
 def create_new_table(filename, p_h, p_t, p_c, l_cap):
     file = open(filename, "w+")
-    file.write("p_h,p_t,p_c,L_cap,M_d,M_v,R_d,R_v\n")
+    file.write("p_h,p_t,p_c,L_cap,M_d,M_v,R_d,R_v,Com_d,Com_v,KDE_d\n")
     file.write(f"{p_h},{p_t},{p_c},{l_cap},,,,\n")
     file.close()
 
@@ -31,29 +31,33 @@ def create_new_row(filename, p_h, p_t, p_c, l_cap):
 def display_graph(filename, row):
     df = pd.read_csv(filename)
 
-    x_values = [1, 2]
-    y_values = [df.at[row, "R_d"], df.at[row, "M_d"]]
-    error_bars = [df.at[row, "R_v"], df.at[row, "M_v"]]
+    x_values = ["Real", "CoDe", "COMPRESS", "KDE"]
+    y_values = [df.at[row, "R_d"], df.at[row, "M_d"], df.at[row, "Com_d"]]
+    error_bars = [df.at[row, "R_v"], df.at[row, "M_v"], df.at[row, "Com_v"]]
 
     x_ticks = range(len(x_values))
     real_bar = plt.bar(0, df.at[row, "R_d"], width=0.1, alpha=0.7, align="center", fill=False, hatch='||--')
     measured_bar = plt.bar(1, df.at[row, "M_d"], width=0.1, alpha=0.7, align="center", fill=False, hatch='////')
+    compress_bar = plt.bar(2, df.at[row, "Com_d"], width=0.1, alpha=0.7, align="center", fill=False, hatch='...')
+    kde_bar = plt.bar(3, df.at[row, "KDE_d"], width=0.1, alpha=0.7, align="center", fill=False, hatch='**')
 
     real_bar[0].set_color("grey")
     measured_bar[0].set_color("red")
+    compress_bar[0].set_color("blue")
+    kde_bar[0].set_color("forestgreen")
 
     plt.title(
         f"Trailing packet: {int(df.at[row, 'p_t'])} Cross traffic packet: {int(df.at[row, 'p_c'])} Link capasity: {int(df.at[row, 'L_cap'])}")
-    plt.legend([real_bar, measured_bar], ["Real", "CoDe"], loc="upper center")
+    plt.legend([real_bar, measured_bar, compress_bar, kde_bar], ["Real", "CoDe", "COMPRESS", "KDE"], loc="upper center")
     plt.xticks(x_ticks, x_values)
-    plt.axhline(df.at[row, "R_d"], color='blue', linestyle='--')
+    plt.grid()
     plt.yticks(np.arange(0, 50, step=1))
     plt.ylabel("Queuing delay in microseconds")
-    plt.errorbar(x_ticks, y_values, yerr=error_bars, fmt="o", color="black", capsize=3)
+    plt.errorbar(x_ticks[0:-1], y_values, yerr=error_bars, fmt="o", color="black", capsize=3)
     plt.show()
 
 
-def display_three_graphs(file1, file2, file3, row):
+def display_four_graphs(file1, file2, file3, row):
     df1 = pd.read_csv(file1)
     df2 = pd.read_csv(file2)
     df3 = pd.read_csv(file3)

@@ -53,7 +53,7 @@ def filter_group(group):
 
 # Creates clusters from an input file
 def create_groups(file):
-    packet_info = file.split("-")
+    packet_info = file.replace("-", " ").replace(".", " ").replace("/", " ").replace("three", "").split()
     data = pd.read_csv(file)
 
     print(f"packet size {packet_info[0]}, link cap {packet_info[2]}")
@@ -79,17 +79,6 @@ grouped_clusters = create_groups(sys.argv[1])
 one = grouped_clusters.get_group(0)
 two = grouped_clusters.get_group(1)
 three = grouped_clusters.get_group(2)
-
-"""
-if len(one) < 35:
-    one = None
-
-if len(two) < 35:
-    two = None
-
-if len(three) < 35:
-    three = None
-"""
 
 # Filter out members of each cluster with a frequency of < 20%
 one = filter_group(one)

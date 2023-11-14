@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import sys
 
+
 def display_cluster(file):
     clusters = open(file, "r+")
 
@@ -27,5 +28,10 @@ def display_cluster(file):
     plt.show()
 
 
-display_cluster(sys.argv[1])
+def main():
+    display_cluster(sys.argv[1])
+
+
+if __name__ == "__main__":
+    main()
 
