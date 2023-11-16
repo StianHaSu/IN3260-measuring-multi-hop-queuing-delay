@@ -19,7 +19,7 @@ std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_int_distribution<> dis(0, 5);
 
-int packet_trains = 400;
+int packet_trains = 500;
 
 uint32_t* calculateTimeIntervals(packet_info *p_info) {
     uint32_t rates[4];
@@ -84,7 +84,6 @@ void GenerateCrossTraffic(packet_info *p_info, Ptr<Socket> socket, int rate) {
 
 //Measures the queue length of a given queue, every rate microseconds
 void traceQueueLength(Ptr<Queue<Packet>> queue, int measurement, std::ofstream *file, int rate) {
-    packet_trains--;
     if (measurement < 1) return;
     *file << queue->GetCurrentSize().GetValue() << ",";
     *file << 400-measurement << "\n";
