@@ -55,9 +55,9 @@ that automatically runs the filtering, gap measuring, and kmeans programs automt
 - Started making graphs for multi-hop case
   - [x] 800-100-100
   - [x] 800-200-100
-  - [ ] 800-300-100
-  - [ ] 1000-100-100
-  - [ ] 1000-200-100
+  - [x] 800-300-100
+  - [x] 1000-100-100
+  - [x] 1000-200-100
   - [ ] 1000-300-100
   - [ ] 1400-100-100
   - [ ] 1400-200-100
