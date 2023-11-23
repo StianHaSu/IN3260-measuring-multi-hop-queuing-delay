@@ -1,43 +1,63 @@
+import math
+
 from sklearn.neighbors import KernelDensity
 import numpy as np
 import pandas as pd
 import sys
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
-from graph_utils import update_value
+from graph_utils import update_value, plot_kde_graph
+from scipy.optimize import fsolve
+
+data_file = sys.argv[1]
+data_from_file = pd.read_csv(data_file)['Gap']
+data = data_from_file.to_numpy()
+data *= 10 ** 6
+data = data.reshape(-1, 1)
 
 
-def plot_kde_graph(x, density, peak_to_gap_map, compression, no_change, de_compression, information):
-    plt.plot(x, density, color="black")
+def check_if_in_group(x1, x2, datapoint):
+    if x1 < datapoint < x2:
+        return True
+    if datapoint == x1 or datapoint == x2:
+        return True
 
-    co = plt.plot(compression, peak_to_gap_map[compression], "o", color="red")
-    nc = plt.plot(no_change, peak_to_gap_map[no_change], "X", color="blue")
-    de = plt.plot(de_compression, peak_to_gap_map[de_compression], "D", color="limegreen")
+    return False
 
-    plt.title(
-        f"Trailing packet: {information[0]} Cross traffic packet: {information[1]} Link capacity: {information[2]}")
-    plt.legend([co[0], nc[0], de[0]], ["Compression peak", "No change peak", "Decompression peak"], loc="upper right")
-    plt.ylabel("Distribution weight")
-    plt.xlabel("Probe gap in microseconds")
-    plt.show()
+
+def calculate_variability(roots, mean):
+    variability = 0
+    elements = 0
+    for _, element in data_from_file.items():
+        if (check_if_in_group(roots["compression_root_1"], roots["compression_root_2"], float(element)) or
+            check_if_in_group(roots["de_compression_root_1"], roots["de_compression_root_2"], float(element)) or
+            check_if_in_group(roots["no_change_root_1"], roots["no_change_root_2"], float(element))
+        ):
+            variability += (element - mean) ** 2
+            elements += 1
+
+    variability = math.sqrt((variability / elements))
+    return variability
+
+
+def kde_func(x):
+    x_reshaped = np.array([x])
+    kde = KernelDensity(kernel='gaussian', bandwidth=0.5).fit(data)
+    return np.exp(kde.score_samples(x_reshaped))
+
+
+# This function makes the finding of zero points in the graph more reliable,
+# Because of the limitations of floating point numbers
+def filter_function(x):
+    return kde_func(x) - 0.0001
 
 
 def main():
-    # Input data file (probe gaps)
-    data_file = sys.argv[1]
-
     # The csv file for the result
-    # output_file = sys.argv[2]
+    output_file = sys.argv[2]
 
     # The row to update
-    # row = int(sys.argv[3])
-
-    data = pd.read_csv(data_file)['Gap']
-    data = data.to_numpy()
-
-    # Turning data from seconds into microseconds
-    data *= 10 ** 6
-    data = data.reshape(-1, 1)
+    row = int(sys.argv[3])
 
     # Running the kernel density estimation algorithm with gaussian kernel
     kde = KernelDensity(kernel='gaussian', bandwidth=0.5).fit(data)
@@ -94,13 +114,38 @@ def main():
 
     total_delay = delay_compression + delay_de_compression
 
-    # update_value(output_file, row, "KDE_d", ("%.2f" % total_delay))
+    update_value(output_file, row, "KDE_d", ("%.2f" % total_delay))
 
+    root1_compression = fsolve(filter_function, compression - 0.5)
+    root2_compression = fsolve(filter_function, compression + 0.5)
+
+    root1_no_change = fsolve(filter_function, no_change - 0.5)
+    root2_no_change = fsolve(filter_function, no_change + 0.5)
+
+    root1_de_compression = fsolve(filter_function, de_compression - 0.5)
+    root2_de_compression = fsolve(filter_function, de_compression + 0.5)
+
+    roots = {
+        "compression_root_1": root1_compression,
+        "compression_root_2": root2_compression,
+        "de_compression_root_1": root1_de_compression,
+        "de_compression_root_2": root2_de_compression,
+        "no_change_root_1": root1_no_change,
+        "no_change_root_2": root2_no_change
+    }
+
+    print(roots.values())
+
+    variability = calculate_variability(roots, no_change)
+
+    print("Variability: ", variability)
+    update_value(output_file, row, "KDE_v", ("%.2f" % variability))
     print("Total delay in micro seconds: ", total_delay)
 
-    if len(sys.argv) == 2:
+    if len(sys.argv) >= 4:
         information = data_file.split("/")[-1].split("-")
-        plot_kde_graph(x, density, peak_to_gap_map, compression, no_change, de_compression, information)
+        information.append("" if len(sys.argv) < 5 else sys.argv[4])
+        plot_kde_graph(x, density, peak_to_gap_map, compression, no_change, de_compression, information, roots)
 
 
 if __name__ == '__main__':

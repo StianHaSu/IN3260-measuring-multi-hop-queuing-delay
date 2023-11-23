@@ -1,7 +1,9 @@
 LEADING_PACKET = 64
-TRAILING_PACKET = 1000
+TRAILING_PACKET = 800
 TRAFFIC_PACKET = 300
 LINK_CAP = 100
+
+DIRECTORY_PATH = ../../../data/3-hops
 
 #Used for the the three intermediate nodes simulation
 NODE_TO_MEASURE = 1
@@ -29,6 +31,8 @@ completeSimulation1:
 	python3 filter_packets.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probes-one.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-one-intermediate-2-1.pcap $(TRAILING_PACKET)
 	python3 gap_measurement.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probes-one.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probe-gaps.csv
 	python3 k_means.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probe-gaps.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 0
+	python3 compress.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probe-gaps.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 0 $(TRAILING_PACKET) $(LINK_CAP)
+	python3 kde.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probe-gaps.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 0
 
 	python3 prepare_simulation.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 1 $(LEADING_PACKET) $(TRAILING_PACKET) $(TRAFFIC_PACKET) $(LINK_CAP)
 	./ns3 run scratch/one-intermediate -- $(LEADING_PACKET) $(TRAILING_PACKET) $(TRAFFIC_PACKET) $(LINK_CAP) 1
@@ -36,6 +40,8 @@ completeSimulation1:
 	python3 filter_packets.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-1-probes-one.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-1-one-intermediate-2-1.pcap $(TRAILING_PACKET)
 	python3 gap_measurement.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-1-probes-one.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-1-probe-gaps.csv
 	python3 k_means.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-1-probe-gaps.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 1
+	python3 compress.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-1-probe-gaps.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 1 $(TRAILING_PACKET) $(LINK_CAP)
+	python3 kde.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-1-probe-gaps.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 1
 
 	python3 prepare_simulation.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 2 $(LEADING_PACKET) $(TRAILING_PACKET) $(TRAFFIC_PACKET) $(LINK_CAP)
 	./ns3 run scratch/one-intermediate -- $(LEADING_PACKET) $(TRAILING_PACKET) $(TRAFFIC_PACKET) $(LINK_CAP) 2
@@ -43,6 +49,8 @@ completeSimulation1:
 	python3 filter_packets.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-2-probes-one.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-2-one-intermediate-2-1.pcap $(TRAILING_PACKET)
 	python3 gap_measurement.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-2-probes-one.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-2-probe-gaps.csv
 	python3 k_means.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-2-probe-gaps.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 2
+	python3 compress.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probe-gaps.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 2 $(TRAILING_PACKET) $(LINK_CAP)
+	python3 kde.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probe-gaps.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 2
 
 	python3 prepare_simulation.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 3 $(LEADING_PACKET) $(TRAILING_PACKET) $(TRAFFIC_PACKET) $(LINK_CAP)
 	./ns3 run scratch/one-intermediate -- $(LEADING_PACKET) $(TRAILING_PACKET) $(TRAFFIC_PACKET) $(LINK_CAP) 3
@@ -50,6 +58,8 @@ completeSimulation1:
 	python3 filter_packets.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-3-probes-one.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-3-one-intermediate-2-1.pcap $(TRAILING_PACKET)
 	python3 gap_measurement.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-3-probes-one.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-3-probe-gaps.csv
 	python3 k_means.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-3-probe-gaps.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 3
+	python3 compress.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-3-probe-gaps.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 3 $(TRAILING_PACKET) $(LINK_CAP)
+	python3 kde.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-3-probe-gaps.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 3
 
 	python3 prepare_simulation.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 4 $(LEADING_PACKET) $(TRAILING_PACKET) $(TRAFFIC_PACKET) $(LINK_CAP)
 	./ns3 run scratch/one-intermediate -- $(LEADING_PACKET) $(TRAILING_PACKET) $(TRAFFIC_PACKET) $(LINK_CAP) 4
@@ -57,6 +67,8 @@ completeSimulation1:
 	python3 filter_packets.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-4-probes-one.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-4-one-intermediate-2-1.pcap $(TRAILING_PACKET)
 	python3 gap_measurement.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-4-probes-one.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-4-probe-gaps.csv
 	python3 k_means.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-4-probe-gaps.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 4
+	python3 compress.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-4-probe-gaps.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 4 $(TRAILING_PACKET) $(LINK_CAP)
+	python3 kde.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-4-probe-gaps.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 4
 
 	mkdir $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)
 	mv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-* $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)
@@ -64,6 +76,7 @@ completeSimulation1:
 completeSimulation3:
 	python3 prepare_simulation.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results-three.csv 0 $(LEADING_PACKET) $(TRAILING_PACKET) $(TRAFFIC_PACKET) $(LINK_CAP)
 	./ns3 run scratch/three-intermediate -- $(LEADING_PACKET) $(TRAILING_PACKET) $(TRAFFIC_PACKET) $(LINK_CAP) 0 $(NODE_TO_MEASURE)
+	python3 real_delay.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-queue-size-$(NODE_TO_MEASURE).csv $(TRAFFIC_PACKET) $(LINK_CAP) $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results-three.csv 0
 	python3 filter_packets.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probes-three.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-three-intermediate-4-1.pcap $(TRAILING_PACKET)
 	python3 gap_measurement.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probes-three.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probe-gaps-three.csv
 	python3 k_means.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probe-gaps-three.csv $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results-three.csv 0
@@ -146,6 +159,25 @@ addKde1:
 	python3 kde.py ./$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-3-probe-gaps.csv ./$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 3
 	python3 kde.py ./$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-4-probe-gaps.csv ./$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 4
 
+
+addKde3:
+	python3 kde.py ../../../data/3-hops/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-$(NODE_TO_MEASURE)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-0-probe-gaps-three.csv ../../../data/3-hops/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-$(NODE_TO_MEASURE)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results-three.csv 0
+	python3 kde.py ../../../data/3-hops/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-$(NODE_TO_MEASURE)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-1-probe-gaps-three.csv ../../../data/3-hops/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-$(NODE_TO_MEASURE)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results-three.csv 1
+	python3 kde.py ../../../data/3-hops/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-$(NODE_TO_MEASURE)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-2-probe-gaps-three.csv ../../../data/3-hops/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-$(NODE_TO_MEASURE)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results-three.csv 2
+	python3 kde.py ../../../data/3-hops/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-$(NODE_TO_MEASURE)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-3-probe-gaps-three.csv ../../../data/3-hops/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-$(NODE_TO_MEASURE)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results-three.csv 3
+	python3 kde.py ../../../data/3-hops/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-$(NODE_TO_MEASURE)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-4-probe-gaps-three.csv ../../../data/3-hops/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-$(NODE_TO_MEASURE)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results-three.csv 4
+
 displayGraph1:
 	python3 graph_utils.py $(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results.csv 5
+
+displayGraph3:
+	python3 graph_utils.py $(DIRECTORY_PATH)/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-1/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results-three.csv $(DIRECTORY_PATH)/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-2/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results-three.csv $(DIRECTORY_PATH)/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-3/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results-three.csv 5
+
+combineClusters3:
+	python3 combine_clusters.py $(DIRECTORY_PATH)/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-3/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP) three
+	python3 combine_clusters.py $(DIRECTORY_PATH)/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-2/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP) three
+	python3 combine_clusters.py $(DIRECTORY_PATH)/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-1/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP) three
+
+createKde3:
+	python3 kde.py $(DIRECTORY_PATH)/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-$(NODE_TO_MEASURE)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-cluster-three.csv $(DIRECTORY_PATH)/three-$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-$(NODE_TO_MEASURE)/$(TRAILING_PACKET)-$(TRAFFIC_PACKET)-$(LINK_CAP)-results-three.csv 6 $(NODE_TO_MEASURE)
 
