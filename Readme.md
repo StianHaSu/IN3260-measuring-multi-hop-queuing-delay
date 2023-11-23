@@ -114,6 +114,19 @@ main categories:
       heading and trailing packets, this is used to estimate the queuing delay
       and standard deviation in ***k_means.py***
 
+Before friday 24:
+- [ ] Finish up presentation
+
+Before wednesday 29. november:  
+- [ ] Run the 1Gbps simulations for the 1-hop  
+- [ ] Prepare plots for the single hop case  
+- [ ] Check the proposed scheme of "shifting" the usable data (sanitize data)  
+- [ ] Describe the different algorithms in the document  
+
+Later:  
+- [ ] Finish up writing about single hop (evaluation, explanation and results)
+- [ ] 
+
 ## How to run   
 1. Navigate to the ns-3.39 directory.  
 2. Run "make build" which builds the project and enable debugging and testing.  
