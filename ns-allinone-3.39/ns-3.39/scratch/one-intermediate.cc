@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
     tch.Install(devices6);
 
     Ipv4AddressHelper address;
-    
+
     address.SetBase("10.1.1.0", "255.255.255.0");
     Ipv4InterfaceContainer interfaces1 = address.Assign(devices1);
 
@@ -157,9 +157,9 @@ int main(int argc, char* argv[]) {
     int queueMeasurementRate = p_info.link_cap == 100 ? 5000 : 500;
 
     //How often a probing pair should be sent
-    //int probingRate = p_info.link_cap == 100 ? 50 : 10;
+    int probingRate = p_info.link_cap == 100 ? 50 : 10;
 
-    //Simulator::Schedule(MilliSeconds(2005), &SendProbingPacket, &p_info, source, 0, probingRate);
+    Simulator::Schedule(MilliSeconds(2005), &SendProbingPacket, &p_info, source, 0, probingRate);
     Simulator::Schedule(MilliSeconds(2010), &traceQueueLength, queue, 400, &file, queueMeasurementRate);
     Simulator::Run();
     Simulator::Destroy();

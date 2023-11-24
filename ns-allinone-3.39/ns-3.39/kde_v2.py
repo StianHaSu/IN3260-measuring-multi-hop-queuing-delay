@@ -42,7 +42,7 @@ def calculate_variability(roots, mean):
 
 def kde_func(x):
     x_reshaped = np.array([x])
-    kde = KernelDensity(kernel='gaussian', bandwidth=0.1).fit(data)
+    kde = KernelDensity(kernel='gaussian', bandwidth=0.5).fit(data)
     return np.exp(kde.score_samples(x_reshaped))
 
 
@@ -60,7 +60,7 @@ def main():
     row = int(sys.argv[3])
 
     # Running the kernel density estimation algorithm with gaussian kernel
-    kde = KernelDensity(kernel='gaussian', bandwidth=0.1).fit(data)
+    kde = KernelDensity(kernel='gaussian', bandwidth=0.5).fit(data)
 
     # Distributing the data evenly, padding on both sides
     x = np.linspace(min(data) - 5, max(data) + 5, len(data))
@@ -125,6 +125,34 @@ def main():
     root1_de_compression = fsolve(filter_function, de_compression - 0.5)
     root2_de_compression = fsolve(filter_function, de_compression + 0.5)
 
+    compression_data = []
+    decompression_data = []
+
+    for data_point in data_from_file:
+        data_point = float(data_point)
+        if data_point < root1_no_change[0]:
+            compression_data.append(data_point)
+
+        if data_point > root2_no_change[0]:
+            decompression_data.append(data_point)
+
+    compression_mean = np.mean(compression_data)
+    decompression_mean = np.mean(decompression_data)
+
+    for compression_point in compression_data:
+        if abs(compression_point - compression_mean) > compression_mean*0.75:
+            compression_data.remove(compression_point)
+
+    for decompression_point in decompression_data:
+        if abs(decompression_point - decompression_mean) > decompression_mean*0.75:
+            decompression_data.remove(decompression_point)
+
+    filtered_mean_compression = np.mean(compression_data)
+    filtered_mean_decompression = np.mean(decompression_data)
+
+    print(f"compression center before: {compression} after: {filtered_mean_compression}")
+    print(f"decompression center before: {de_compression} after: {filtered_mean_decompression}")
+
     roots = {
         "compression_root_1": root1_compression,
         "compression_root_2": root2_compression,
@@ -141,6 +169,12 @@ def main():
     print("Variability: ", variability)
     update_value(output_file, row, "KDE_v", ("%.2f" % variability))
     print("Total delay in micro seconds: ", total_delay)
+
+    alt_weight_com = len(compression_data)/(len(compression_data) + len(decompression_data))
+    alt_weight_decom = len(decompression_data) / (len(compression_data) + len(decompression_data))
+    alt_delay = ((no_change - filtered_mean_compression)*alt_weight_com +
+                 (filtered_mean_decompression - no_change)*alt_weight_decom)
+    print(f"\n alternative delay: {alt_delay}")
 
     if len(sys.argv) >= 4:
         information = data_file.split("/")[-1].split("-")
